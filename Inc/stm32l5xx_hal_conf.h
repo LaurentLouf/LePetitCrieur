@@ -102,8 +102,8 @@ extern "C" {
  *        This value is the default MSI range value after Reset.
  */
 #if !defined(MSI_VALUE)
-#define MSI_VALUE 48000000UL /*!< Value of the Internal oscillator in Hz*/
-#endif                       /* MSI_VALUE */
+#define MSI_VALUE 4000000UL /*!< Value of the Internal oscillator in Hz*/
+#endif                      /* MSI_VALUE */
 
 /**
  * @brief Internal High Speed oscillator (HSI) value.
