@@ -184,6 +184,10 @@ $(BUILD_DIR):
 clean:
 	-rm -fR $(BUILD_DIR)
 
+flash:
+	#cp $(BUILD_DIR)/$(TARGET).bin /media/laurent/DIS_L562QE/
+	openocd -f openocd_interface_target_stlink.cfg -f openocd_stm32_flash.cfg
+
 #######################################
 # dependencies
 #######################################
