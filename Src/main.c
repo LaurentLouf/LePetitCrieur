@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
 #include "dfsdm.h"
 #include "dma.h"
 #include "fmc.h"
@@ -30,7 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,17 +41,26 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define RECORD_BUFFER_SIZE 2048  //!< Maximum number of samples for FFT is 1024
+#define NUMBER_BUFFER_SAVE \
+  323  //!< We want to save 15s of sound after first detection of high noise.
+       //!< We're sampling at 44.1kHz, which thus requires 661500 samples, or
+       //!< 323 buffers of 2048 samples.
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define SaturateLowHigh(number, low, high) \
+  (((number) < (low)) ? (low) : (((number) > (high)) ? (high) : (number)))
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+int32_t record_buffer[RECORD_BUFFER_SIZE];
+__IO uint32_t DmaRecHalfBuffCplt = 0;
+__IO uint32_t DmaRecBuffCplt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -104,11 +114,30 @@ int main(void) {
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
 
+  /* Start DFSDM conversions */
+  if (HAL_OK != HAL_DFSDM_FilterRegularStart_DMA(
+                    &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
+    Error_Handler();
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t max_absolute_value = 0;
   while (1) {
+    if (DmaRecHalfBuffCplt == 1) {
+      DmaRecHalfBuffCplt = 0;
+    }
+    if (DmaRecBuffCplt == 1) {
+      HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+      DmaRecBuffCplt = 0;
+      for (uint16_t i_sample = 0; i_sample < RECORD_BUFFER_SIZE; i_sample++) {
+        if (abs(i_sample) > max_absolute_value) {
+          max_absolute_value = abs(record_buffer[i_sample]);
+        }
+      }
+      max_absolute_value = 0;
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -160,7 +189,31 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
+/**
+ * @brief  Half regular conversion complete callback.
+ * @param  hdfsdm_filter : DFSDM filter handle.
+ * @retval None
+ */
+void HAL_DFSDM_FilterRegConvHalfCpltCallback(
+    DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
+  if (hdfsdm_filter == &hdfsdm1_filter0) {
+    DmaRecHalfBuffCplt = 1;
+  }
+}
 
+/**
+  * @brief  Regular conversion complete callback.
+  * @note   In interrupt mode, user has to read conversion value in this
+  function using HAL_DFSDM_FilterGetRegularValue.
+  * @param  hdfsdm_filter : DFSDM filter handle.
+  * @retval None
+  */
+void HAL_DFSDM_FilterRegConvCpltCallback(
+    DFSDM_Filter_HandleTypeDef *hdfsdm_filter) {
+  if (hdfsdm_filter == &hdfsdm1_filter0) {
+    DmaRecBuffCplt = 1;
+  }
+}
 /* USER CODE END 4 */
 
 /**
@@ -170,7 +223,11 @@ void SystemClock_Config(void) {
 void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  while (1) {
+    /* Toggle LED_RED with a period of one second */
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    HAL_Delay(1000);
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
