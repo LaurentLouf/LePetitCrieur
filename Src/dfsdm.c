@@ -28,9 +28,21 @@ DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
-/* DFSDM1 init function */
+/**
+ * \brief Initialize the DFSDM (Digital Filter Sigma-Delta Modulator)
+ *
+ * The MEMS microphone uses the clock provided by the DFSDM. It can uses clock
+ * frequencies from 351kHz to 4.8MHz. So we enable the output clock and use a
+ * prescaer value of 4 to get a frequency of
+ * 11.294MHz (clock used by DFSDM) / 4 = 2.8235MHz, right in the range.
+ *
+ * For the filter, a 3rd order filter and an oversampling of 64 samples gives an
+ * output resolution of 1+3*log2(64) = 19 bits.
+ *
+ * The filter for the analog watchdog (awd) is also initialized but not the
+ * analog watchdog itself (thresholds).
+ */
 void MX_DFSDM1_Init(void) {
-
   hdfsdm1_filter0.Instance = DFSDM1_Filter0;
   hdfsdm1_filter0.Init.RegularParam.Trigger = DFSDM_FILTER_SW_TRIGGER;
   hdfsdm1_filter0.Init.RegularParam.FastMode = ENABLE;
@@ -70,7 +82,6 @@ static uint32_t HAL_RCC_DFSDM1_CLK_ENABLED = 0;
 static uint32_t DFSDM1_Init = 0;
 
 void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
-
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if (DFSDM1_Init == 0) {
@@ -159,7 +170,6 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
 
 void HAL_DFSDM_ChannelMspInit(
     DFSDM_Channel_HandleTypeDef *dfsdm_channelHandle) {
-
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if (DFSDM1_Init == 0) {
@@ -219,7 +229,6 @@ void HAL_DFSDM_ChannelMspInit(
 }
 
 void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
-
   DFSDM1_Init--;
   if (DFSDM1_Init == 0) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
@@ -248,7 +257,6 @@ void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
 
 void HAL_DFSDM_ChannelMspDeInit(
     DFSDM_Channel_HandleTypeDef *dfsdm_channelHandle) {
-
   DFSDM1_Init--;
   if (DFSDM1_Init == 0) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
