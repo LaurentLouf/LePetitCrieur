@@ -31,6 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "stm32_lcd.h"
@@ -71,9 +72,10 @@ uint16_t GPIO_Pin_port_toggle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void LCD_Init(void);
-void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
-                                 uint32_t i_extreme_computed,
-                                 uint32_t i_tick_begin);
+void LCD_Display_Microphone_Info_Init(void);
+void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
+                                        uint32_t i_extreme_computed,
+                                        uint32_t i_tick_begin);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -125,6 +127,7 @@ int main(void) {
 
   /* Start DFSDM conversions */
   LCD_Init();
+  LCD_Display_Microphone_Info_Init();
   if (HAL_OK != HAL_DFSDM_FilterRegularStart_DMA(
                     &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
     Error_Handler();
@@ -244,13 +247,31 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
   }
 }
 
-void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
-                                 uint32_t i_extreme_computed,
-                                 uint32_t i_tick_begin) {
+void LCD_Display_Microphone_Info_Init(void) {
+  UTIL_LCD_SetFont(&Font12);
+
+  /* Set the LCD Text Color */
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_DARKBLUE);
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+
+  /* Display LCD messages */
+  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)"Max detected", LEFT_MODE);
+  UTIL_LCD_DrawHLine(0, 30, 240, UTIL_LCD_COLOR_DARKBLUE);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)"Max computed", LEFT_MODE);
+  UTIL_LCD_DrawHLine(0, 55, 240, UTIL_LCD_COLOR_DARKBLUE);
+  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)"Ratio", LEFT_MODE);
+  UTIL_LCD_DrawHLine(0, 80, 240, UTIL_LCD_COLOR_DARKBLUE);
+  UTIL_LCD_DisplayStringAt(0, 85, (uint8_t *)"Time", LEFT_MODE);
+}
+
+void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
+                                        uint32_t i_extreme_computed,
+                                        uint32_t i_tick_begin) {
   char message_detected[64] = {'\0'}, message_computed[64] = {'\0'},
-       message_time[64] = {'\0'};
-  sprintf(message_detected, "Max detected %08lu", i_extreme_detected);
-  sprintf(message_computed, "Max computed %08lu", i_extreme_computed);
+       message_time[64] = {'\0'}, message_ratio[64] = {'\0'};
+  sprintf(message_detected, "%012lu", i_extreme_detected);
+  sprintf(message_computed, "%012lu", i_extreme_computed);
+  sprintf(message_ratio, "%04lu", i_extreme_computed / i_extreme_detected);
 
   UTIL_LCD_SetFont(&Font12);
 
@@ -259,12 +280,14 @@ void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
   UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
 
   /* Display LCD messages */
-  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, LEFT_MODE);
-  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, LEFT_MODE);
+  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, RIGHT_MODE);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, RIGHT_MODE);
+  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_ratio, RIGHT_MODE);
 
-  sprintf(message_time, "Time %04lu", HAL_GetTick() - i_tick_begin);
-  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_time, LEFT_MODE);
+  sprintf(message_time, "%04lu", HAL_GetTick() - i_tick_begin);
+  UTIL_LCD_DisplayStringAt(0, 85, (uint8_t *)message_time, RIGHT_MODE);
 }
+
 /**
   * @brief  Regular conversion complete callback.
   * @note   In interrupt mode, user has to read conversion value in this
