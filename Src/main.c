@@ -68,6 +68,10 @@ __IO uint32_t DmaRecBuffCplt = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void LCD_Init(void);
+void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
+                                 uint32_t i_extreme_computed,
+                                 uint32_t i_tick_begin);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -118,6 +122,7 @@ int main(void) {
   /* USER CODE BEGIN 2 */
 
   /* Start DFSDM conversions */
+  LCD_Init();
   if (HAL_OK != HAL_DFSDM_FilterRegularStart_DMA(
                     &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
     Error_Handler();
@@ -192,6 +197,37 @@ void SystemClock_Config(void) {
 }
 
 /* USER CODE BEGIN 4 */
+
+void LCD_Init(void) {
+  LCD_UTILS_Drv_t lcdDrv;
+
+  /* Initialize the LCD */
+  if (BSP_LCD_Init(0, LCD_ORIENTATION_PORTRAIT) != BSP_ERROR_NONE) {
+    Error_Handler();
+  }
+
+  /* Set UTIL_LCD functions */
+  lcdDrv.DrawBitmap = BSP_LCD_DrawBitmap;
+  lcdDrv.FillRGBRect = BSP_LCD_FillRGBRect;
+  lcdDrv.DrawHLine = BSP_LCD_DrawHLine;
+  lcdDrv.DrawVLine = BSP_LCD_DrawVLine;
+  lcdDrv.FillRect = BSP_LCD_FillRect;
+  lcdDrv.GetPixel = BSP_LCD_ReadPixel;
+  lcdDrv.SetPixel = BSP_LCD_WritePixel;
+  lcdDrv.GetXSize = BSP_LCD_GetXSize;
+  lcdDrv.GetYSize = BSP_LCD_GetYSize;
+  lcdDrv.SetLayer = BSP_LCD_SetActiveLayer;
+  lcdDrv.GetFormat = BSP_LCD_GetFormat;
+  UTIL_LCD_SetFuncDriver(&lcdDrv);
+
+  /* Clear the LCD */
+  UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
+
+  /* Set the display on */
+  if (BSP_LCD_DisplayOn(0) != BSP_ERROR_NONE) {
+    Error_Handler();
+  }
+}
 /**
  * @brief  Half regular conversion complete callback.
  * @param  hdfsdm_filter : DFSDM filter handle.
@@ -204,6 +240,30 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(
   }
 }
 
+void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
+                                 uint32_t i_extreme_computed,
+                                 uint32_t i_tick_begin) {
+  char message_detected[64] = {'\0'}, message_computed[64] = {'\0'},
+       message_time[64] = {'\0'};
+  sprintf(message_detected, "Max detected %lu", i_extreme_detected);
+  sprintf(message_computed, "Max computed %lu", i_extreme_computed);
+
+  UTIL_LCD_SetFont(&Font12);
+
+  /* Clear the LCD */
+  UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
+
+  /* Set the LCD Text Color */
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_DARKBLUE);
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+
+  /* Display LCD messages */
+  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, CENTER_MODE);
+
+  sprintf(message_time, "Time %lu", HAL_GetTick() - i_tick_begin);
+  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_time, CENTER_MODE);
+}
 /**
   * @brief  Regular conversion complete callback.
   * @note   In interrupt mode, user has to read conversion value in this
