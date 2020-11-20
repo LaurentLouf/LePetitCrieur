@@ -33,6 +33,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 
+#include "stm32_lcd.h"
 #include "stm32l562e_discovery_lcd.h"
 /* USER CODE END Includes */
 
