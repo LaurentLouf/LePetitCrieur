@@ -64,6 +64,8 @@
 int32_t record_buffer[RECORD_BUFFER_SIZE];
 __IO uint32_t DmaRecHalfBuffCplt = 0;
 __IO uint32_t DmaRecBuffCplt = 0;
+GPIO_TypeDef *GPIO_port_toggle;
+uint16_t GPIO_Pin_port_toggle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -127,6 +129,8 @@ int main(void) {
                     &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
     Error_Handler();
   }
+  GPIO_port_toggle = LED_GREEN_GPIO_Port;
+  GPIO_Pin_port_toggle = LED_GREEN_Pin;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -134,10 +138,10 @@ int main(void) {
   uint32_t max_absolute_value = 0;
   while (1) {
     if (DmaRecHalfBuffCplt == 1) {
+      HAL_GPIO_TogglePin(GPIO_port_toggle, GPIO_Pin_port_toggle);
       DmaRecHalfBuffCplt = 0;
     }
     if (DmaRecBuffCplt == 1) {
-      HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
       DmaRecBuffCplt = 0;
       for (uint16_t i_sample = 0; i_sample < RECORD_BUFFER_SIZE; i_sample++) {
         if (abs(i_sample) > max_absolute_value) {
@@ -277,6 +281,20 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
     DmaRecBuffCplt = 1;
   }
 }
+
+/**
+ * @brief  Filter analog watchdog callback.
+ * @param  hdfsdm_filter DFSDM filter handle.
+ * @param  Channel Corresponding channel.
+ * @param  Threshold Low or high threshold has been reached.
+ * @retval None
+ */
+void HAL_DFSDM_FilterAwdCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter,
+                                 uint32_t Channel, uint32_t Threshold) {
+  GPIO_port_toggle = LED_RED_GPIO_Port;
+  GPIO_Pin_port_toggle = LED_RED_Pin;
+}
+
 /* USER CODE END 4 */
 
 /**

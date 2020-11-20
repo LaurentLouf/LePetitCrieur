@@ -26,6 +26,7 @@
 
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
+DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
 /**
@@ -64,8 +65,8 @@ void MX_DFSDM1_Init(void) {
   hdfsdm1_channel1.Init.SerialInterface.Type = DFSDM_CHANNEL_SPI_RISING;
   hdfsdm1_channel1.Init.SerialInterface.SpiClock =
       DFSDM_CHANNEL_SPI_CLOCK_INTERNAL;
-  hdfsdm1_channel1.Init.Awd.FilterOrder = DFSDM_CHANNEL_SINC1_ORDER;
-  hdfsdm1_channel1.Init.Awd.Oversampling = 10;
+  hdfsdm1_channel1.Init.Awd.FilterOrder = DFSDM_CHANNEL_SINC3_ORDER;
+  hdfsdm1_channel1.Init.Awd.Oversampling = 32;
   hdfsdm1_channel1.Init.Offset = 0;
   hdfsdm1_channel1.Init.RightBitShift = 0x00;
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel1) != HAL_OK) {
@@ -73,6 +74,22 @@ void MX_DFSDM1_Init(void) {
   }
   if (HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1_filter0, DFSDM_CHANNEL_1,
                                        DFSDM_CONTINUOUS_CONV_ON) != HAL_OK) {
+    Error_Handler();
+  }
+
+  hdsfdm1_awd.DataSource = DFSDM_FILTER_AWD_FILTER_DATA;
+  hdsfdm1_awd.Channel =
+      DFSDM_CHANNEL_0 | DFSDM_CHANNEL_1 | DFSDM_CHANNEL_2 | DFSDM_CHANNEL_3;
+  hdsfdm1_awd.HighThreshold = 1000;
+  hdsfdm1_awd.LowThreshold = -8388608;
+  hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
+  hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
+
+  if (HAL_DFSDM_FilterAwdStart_IT(&hdfsdm1_filter0, &hdsfdm1_awd) != HAL_OK) {
+    Error_Handler();
+  }
+
+  if (HAL_DFSDM_FilterExdStart(&hdfsdm1_filter0, DFSDM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }
 }
