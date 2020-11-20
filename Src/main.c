@@ -140,17 +140,32 @@ int main(void) {
   /* USER CODE BEGIN WHILE */
   uint32_t max_absolute_value = 0;
   while (1) {
-    if (DmaRecHalfBuffCplt == 1) {
-      HAL_GPIO_TogglePin(GPIO_port_toggle, GPIO_Pin_port_toggle);
-      DmaRecHalfBuffCplt = 0;
-    }
-    if (DmaRecBuffCplt == 1) {
-      DmaRecBuffCplt = 0;
-      for (uint16_t i_sample = 0; i_sample < RECORD_BUFFER_SIZE; i_sample++) {
-        if (abs(i_sample) > max_absolute_value) {
-          max_absolute_value = abs(record_buffer[i_sample]);
+    if (DmaRecHalfBuffCplt == 1 || DmaRecBuffCplt == 1) {
+      uint16_t i_first_sample = 0;
+      if (DmaRecBuffCplt == 1) {
+        i_first_sample = RECORD_BUFFER_SIZE / 2;
+        DmaRecBuffCplt = 0;
+        HAL_GPIO_TogglePin(GPIO_port_toggle, GPIO_Pin_port_toggle);
+      } else {
+        DmaRecHalfBuffCplt = 0;
+      }
+      uint32_t channel;
+      uint32_t tick_begin;
+      tick_begin = HAL_GetTick();
+
+      int32_t max_value =
+          HAL_DFSDM_FilterGetExdMaxValue(&hdfsdm1_filter0, &channel);
+      uint16_t i_sample_max_value;
+      for (uint16_t i_sample = i_first_sample;
+           i_sample < i_first_sample + RECORD_BUFFER_SIZE / 2; i_sample++) {
+        if (record_buffer[i_sample] > 0 &&
+            record_buffer[i_sample] > max_absolute_value) {
+          max_absolute_value = record_buffer[i_sample];
+          i_sample_max_value = i_sample;
         }
       }
+      LCD_Display_Microphone_Info_Update(max_value, max_absolute_value,
+                                         tick_begin);
       max_absolute_value = 0;
     }
     /* USER CODE END WHILE */
