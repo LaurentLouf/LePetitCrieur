@@ -249,24 +249,21 @@ void LCD_Display_Microphone_Info(uint32_t i_extreme_detected,
                                  uint32_t i_tick_begin) {
   char message_detected[64] = {'\0'}, message_computed[64] = {'\0'},
        message_time[64] = {'\0'};
-  sprintf(message_detected, "Max detected %lu", i_extreme_detected);
-  sprintf(message_computed, "Max computed %lu", i_extreme_computed);
+  sprintf(message_detected, "Max detected %08lu", i_extreme_detected);
+  sprintf(message_computed, "Max computed %08lu", i_extreme_computed);
 
   UTIL_LCD_SetFont(&Font12);
-
-  /* Clear the LCD */
-  UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
 
   /* Set the LCD Text Color */
   UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_DARKBLUE);
   UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
 
   /* Display LCD messages */
-  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, CENTER_MODE);
-  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, LEFT_MODE);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, LEFT_MODE);
 
-  sprintf(message_time, "Time %lu", HAL_GetTick() - i_tick_begin);
-  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_time, CENTER_MODE);
+  sprintf(message_time, "Time %04lu", HAL_GetTick() - i_tick_begin);
+  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_time, LEFT_MODE);
 }
 /**
   * @brief  Regular conversion complete callback.
