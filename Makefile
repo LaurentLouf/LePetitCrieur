@@ -9,8 +9,8 @@ TARGET = LePetitCrieur
 ######################################
 # debug build?
 DEBUG = 1
-# optimization
-OPT = -Og
+# optimization (use O0 instead of Og for debugging)
+OPT = -O0
 
 
 #######################################
