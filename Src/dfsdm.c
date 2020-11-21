@@ -38,7 +38,9 @@ DMA_HandleTypeDef hdma_dfsdm1_flt0;
  * 11.294MHz (clock used by DFSDM) / 4 = 2.8235MHz, right in the range.
  *
  * For the filter, a 3rd order filter and an oversampling of 64 samples gives an
- * output resolution of 1+3*log2(64) = 19 bits.
+ * output resolution of 1+3*log2(64) = 19 bits. For use of the data, see the
+ * reference manual for DFSDM_FLTxJDATAR registers : only the 24MSB make the
+ * sample data, the first 8 LSB only contain the DFSDM channel.
  *
  * The filter for the analog watchdog (awd) is also initialized but not the
  * analog watchdog itself (thresholds).
