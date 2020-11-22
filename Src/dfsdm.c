@@ -154,7 +154,9 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
-
+    /* DFSDM1 interrupt Init */
+    HAL_NVIC_SetPriority(DFSDM1_FLT0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DFSDM1_FLT0_IRQn);
     /* USER CODE END DFSDM1_MspInit 1 */
     DFSDM1_Init++;
   }
