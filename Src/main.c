@@ -74,7 +74,6 @@ void SystemClock_Config(void);
 void LCD_Init(void);
 void LCD_Display_Microphone_Info_Init(void);
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
-                                        uint32_t i_extreme_computed,
                                         uint32_t i_tick_begin);
 /* USER CODE BEGIN PFP */
 
@@ -164,8 +163,7 @@ int main(void) {
           i_sample_max_value = i_sample;
         }
       }
-      LCD_Display_Microphone_Info_Update(max_value, max_absolute_value,
-                                         tick_begin);
+      LCD_Display_Microphone_Info_Update(max_value, tick_begin);
       max_absolute_value = 0;
     }
     /* USER CODE END WHILE */
@@ -272,21 +270,13 @@ void LCD_Display_Microphone_Info_Init(void) {
   /* Display LCD messages */
   UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)"Max detected", LEFT_MODE);
   UTIL_LCD_DrawHLine(0, 30, 240, UTIL_LCD_COLOR_DARKBLUE);
-  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)"Max computed", LEFT_MODE);
-  UTIL_LCD_DrawHLine(0, 55, 240, UTIL_LCD_COLOR_DARKBLUE);
-  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)"Ratio", LEFT_MODE);
-  UTIL_LCD_DrawHLine(0, 80, 240, UTIL_LCD_COLOR_DARKBLUE);
-  UTIL_LCD_DisplayStringAt(0, 85, (uint8_t *)"Time", LEFT_MODE);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)"Time", LEFT_MODE);
 }
 
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
-                                        uint32_t i_extreme_computed,
                                         uint32_t i_tick_begin) {
-  char message_detected[64] = {'\0'}, message_computed[64] = {'\0'},
-       message_time[64] = {'\0'}, message_ratio[64] = {'\0'};
-  sprintf(message_detected, "%012lu", i_extreme_detected);
-  sprintf(message_computed, "%012lu", i_extreme_computed);
-  sprintf(message_ratio, "%04lu", i_extreme_computed / i_extreme_detected);
+  char message_detected[64] = {'\0'}, message_time[64] = {'\0'};
+  sprintf(message_detected, "%010lu", i_extreme_detected);
 
   UTIL_LCD_SetFont(&Font12);
 
@@ -296,11 +286,8 @@ void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
 
   /* Display LCD messages */
   UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)message_detected, RIGHT_MODE);
-  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_computed, RIGHT_MODE);
-  UTIL_LCD_DisplayStringAt(0, 60, (uint8_t *)message_ratio, RIGHT_MODE);
-
-  sprintf(message_time, "%04lu", HAL_GetTick() - i_tick_begin);
-  UTIL_LCD_DisplayStringAt(0, 85, (uint8_t *)message_time, RIGHT_MODE);
+  sprintf(message_time, "%03lu", HAL_GetTick() - i_tick_begin);
+  UTIL_LCD_DisplayStringAt(0, 35, (uint8_t *)message_time, RIGHT_MODE);
 }
 
 /**
