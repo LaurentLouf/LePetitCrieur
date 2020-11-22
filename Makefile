@@ -24,13 +24,12 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Src/debug.c \
 Src/dfsdm.c \
 Src/dma.c \
 Src/fmc.c \
 Src/gpio.c \
-Src/gtzc.c \
 Src/main.c \
+Src/crc.c \
 Src/octospi.c \
 Src/stm32l5xx_hal_msp.c \
 Src/stm32l5xx_it.c \
@@ -42,6 +41,8 @@ Src/stm32l562e_discovery_lcd.c \
 Src/stm32_lcd.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_cortex.c \
+Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_crc.c \
+Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_crc_ex.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_dfsdm.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_dfsdm_ex.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_dma.c \
@@ -51,7 +52,6 @@ Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_flash.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_flash_ex.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_flash_ramfunc.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_gpio.c \
-Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_gtzc.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_i2c.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_i2c_ex.c \
 Drivers/STM32L5xx_HAL_Driver/Src/stm32l5xx_hal_icache.c \
