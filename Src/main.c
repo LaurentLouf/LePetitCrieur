@@ -71,11 +71,11 @@ uint16_t GPIO_Pin_port_toggle;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
 void LCD_Init(void);
 void LCD_Display_Microphone_Info_Init(void);
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
                                         uint32_t i_tick_begin);
-/* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
@@ -174,7 +174,8 @@ void SystemClock_Config(void) {
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE0) != HAL_OK) {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the RCC Oscillators according to the specified parameters
+   * in the RCC_OscInitTypeDef structure.
    */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
@@ -190,7 +191,7 @@ void SystemClock_Config(void) {
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB buses clocks
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
                                 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
