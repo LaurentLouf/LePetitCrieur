@@ -151,18 +151,8 @@ int main(void) {
       uint32_t channel;
       uint32_t tick_begin;
       tick_begin = HAL_GetTick();
-
       int32_t max_value =
           HAL_DFSDM_FilterGetExdMaxValue(&hdfsdm1_filter0, &channel);
-      uint16_t i_sample_max_value;
-      for (uint16_t i_sample = i_first_sample;
-           i_sample < i_first_sample + RECORD_BUFFER_SIZE / 2; i_sample++) {
-        if (record_buffer[i_sample] > 0 &&
-            record_buffer[i_sample] > max_absolute_value) {
-          max_absolute_value = record_buffer[i_sample];
-          i_sample_max_value = i_sample;
-        }
-      }
       LCD_Display_Microphone_Info_Update(max_value, tick_begin);
       max_absolute_value = 0;
     }
