@@ -21,12 +21,11 @@
 #include "dfsdm.h"
 
 /* USER CODE BEGIN 0 */
-
+DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
 /* USER CODE END 0 */
 
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
-DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
 /**
@@ -79,6 +78,7 @@ void MX_DFSDM1_Init(void) {
     Error_Handler();
   }
 
+  /* USER CODE BEGIN MX_DFSDM1_Init */
   hdsfdm1_awd.DataSource = DFSDM_FILTER_AWD_FILTER_DATA;
   hdsfdm1_awd.Channel =
       DFSDM_CHANNEL_0 | DFSDM_CHANNEL_1 | DFSDM_CHANNEL_2 | DFSDM_CHANNEL_3;
@@ -94,13 +94,14 @@ void MX_DFSDM1_Init(void) {
   if (HAL_DFSDM_FilterExdStart(&hdfsdm1_filter0, DFSDM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }
+  /* USER CODE END MX_DFSDM1_Init */
 }
 
 static uint32_t HAL_RCC_DFSDM1_CLK_ENABLED = 0;
 
 static uint32_t DFSDM1_Init = 0;
 
-void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
+void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if (DFSDM1_Init == 0) {
@@ -180,7 +181,8 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
     }
 
     /* Several peripheral DMA handle pointers point to the same DMA handle.
-     Be aware that there is only one channel to perform all the requested DMAs.
+     Be aware that there is only one channel to perform all the requested
+     DMAs.
    */
     __HAL_LINKDMA(dfsdm_filterHandle, hdmaInj, hdma_dfsdm1_flt0);
     __HAL_LINKDMA(dfsdm_filterHandle, hdmaReg, hdma_dfsdm1_flt0);
@@ -188,7 +190,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
 }
 
 void HAL_DFSDM_ChannelMspInit(
-    DFSDM_Channel_HandleTypeDef *dfsdm_channelHandle) {
+    DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if (DFSDM1_Init == 0) {
@@ -247,7 +249,7 @@ void HAL_DFSDM_ChannelMspInit(
   }
 }
 
-void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
+void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
   DFSDM1_Init--;
   if (DFSDM1_Init == 0) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
@@ -275,7 +277,7 @@ void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef *dfsdm_filterHandle) {
 }
 
 void HAL_DFSDM_ChannelMspDeInit(
-    DFSDM_Channel_HandleTypeDef *dfsdm_channelHandle) {
+    DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle) {
   DFSDM1_Init--;
   if (DFSDM1_Init == 0) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
@@ -302,4 +304,5 @@ void HAL_DFSDM_ChannelMspDeInit(
 
 /* USER CODE END 1 */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF
+ * FILE****/

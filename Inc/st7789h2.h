@@ -119,9 +119,10 @@ typedef struct {
   0x01U /* Landscape orientation choice of LCD screen */
 #define ST7789H2_ORIENTATION_PORTRAIT_ROT180                                   \
   0x02U /* Portrait with 180 degrees rotation orientation choice of LCD screen \
+         * \                                                                   \
          */
 #define ST7789H2_ORIENTATION_LANDSCAPE_ROT180                                  \
-  0x03U /* Landscape with 180 degrees rotation orientation choice of LCD       \
+  0x03U /* Landscape with 180 degrees rotation orientation choice of LCD \                                                                             \
            screen */
 
 #define ST7789H2_FORMAT_RBG444                                                 \

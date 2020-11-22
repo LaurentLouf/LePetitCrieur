@@ -45,9 +45,10 @@ extern "C" {
 #define BSP_TS_IT_PRIORITY 0x07UL /* Default is lowest priority level */
 
 /* Audio interrupt priorities */
-#define BSP_AUDIO_OUT_IT_PRIORITY 0x07UL /* Default is lowest priority level   \
-                                          */
-#define BSP_AUDIO_IN_IT_PRIORITY 0x07UL  /* Default is lowest priority level */
+#define BSP_AUDIO_OUT_IT_PRIORITY                                              \
+  0x07UL /* Default is lowest priority level   \                               \
+          */
+#define BSP_AUDIO_IN_IT_PRIORITY 0x07UL /* Default is lowest priority level */
 
 /* SD card interrupt priority */
 #define BSP_SD_IT_PRIORITY 0x07UL /* Default is lowest priority level */

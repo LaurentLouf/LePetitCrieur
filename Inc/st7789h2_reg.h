@@ -88,8 +88,9 @@ extern "C" {
 #define ST7789H2_READ_CTRL_DISPLAY 0x54U
 #define ST7789H2_WRITE_CACE                                                    \
   0x55U /* Write Content Adaptive Brightness Control and Color Enhancement */
-#define ST7789H2_READ_CABC 0x56U /* Read Content Adaptive Brightness Control   \
-                                  */
+#define ST7789H2_READ_CABC                                                     \
+  0x56U /* Read Content Adaptive Brightness Control   \                        \
+         */
 #define ST7789H2_SET_CABC_MIN_BRIGHTNESS 0x5EU
 #define ST7789H2_GET_CABC_MIN_BRIGHTNESS 0x5FU
 #define ST7789H2_READ_ABCSDR                                                   \
