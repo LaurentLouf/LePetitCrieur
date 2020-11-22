@@ -242,6 +242,9 @@ void HAL_DFSDM_ChannelMspInit(
     GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* DFSDM1 interrupt Init */
+    HAL_NVIC_SetPriority(DFSDM1_FLT0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DFSDM1_FLT0_IRQn);
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
     /* USER CODE END DFSDM1_MspInit 1 */
@@ -294,6 +297,8 @@ void HAL_DFSDM_ChannelMspDeInit(
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12);
 
+    /* DFSDM1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(DFSDM1_FLT0_IRQn);
     /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
 
     /* USER CODE END DFSDM1_MspDeInit 1 */
