@@ -101,14 +101,14 @@ UTIL_LCD_SetFuncDriver() API to link board LCD drivers to BASIC GUI LCD drivers.
 #define POLY_X(Z) ((int32_t)((Points + (Z))->X))
 #define POLY_Y(Z) ((int32_t)((Points + (Z))->Y))
 
-#define CONVERTARGB88882RGB565(Color)                 \
-  ((((Color & 0xFFU) >> 3) & 0x1FU) |                 \
-   (((((Color & 0xFF00U) >> 8) >> 2) & 0x3FU) << 5) | \
+#define CONVERTARGB88882RGB565(Color)                                          \
+  ((((Color & 0xFFU) >> 3) & 0x1FU) |                                          \
+   (((((Color & 0xFF00U) >> 8) >> 2) & 0x3FU) << 5) |                          \
    (((((Color & 0xFF0000U) >> 16) >> 3) & 0x1FU) << 11))
 
-#define CONVERTRGB5652ARGB8888(Color)                      \
-  (((((((Color >> 11) & 0x1FU) * 527) + 23) >> 6) << 16) | \
-   ((((((Color >> 5) & 0x3FU) * 259) + 33) >> 6) << 8) |   \
+#define CONVERTRGB5652ARGB8888(Color)                                          \
+  (((((((Color >> 11) & 0x1FU) * 527) + 23) >> 6) << 16) |                     \
+   ((((((Color >> 5) & 0x3FU) * 259) + 33) >> 6) << 8) |                       \
    ((((Color & 0x1FU) * 527) + 23) >> 6) | 0xFF000000)
 
 /**
@@ -386,31 +386,31 @@ void UTIL_LCD_DisplayStringAt(uint32_t Xpos, uint32_t Ypos, uint8_t *Text,
   uint8_t *ptr = Text;
 
   /* Get the text size */
-  while (*ptr++) size++;
+  while (*ptr++)
+    size++;
 
   /* Characters number per line */
   xsize = (DrawProp->LcdXsize / DrawProp[DrawProp->LcdLayer].pFont->Width);
 
   switch (Mode) {
-    case CENTER_MODE: {
-      refcolumn =
-          Xpos +
-          ((xsize - size) * DrawProp[DrawProp->LcdLayer].pFont->Width) / 2;
-      break;
-    }
-    case LEFT_MODE: {
-      refcolumn = Xpos;
-      break;
-    }
-    case RIGHT_MODE: {
-      refcolumn =
-          -Xpos + ((xsize - size) * DrawProp[DrawProp->LcdLayer].pFont->Width);
-      break;
-    }
-    default: {
-      refcolumn = Xpos;
-      break;
-    }
+  case CENTER_MODE: {
+    refcolumn =
+        Xpos + ((xsize - size) * DrawProp[DrawProp->LcdLayer].pFont->Width) / 2;
+    break;
+  }
+  case LEFT_MODE: {
+    refcolumn = Xpos;
+    break;
+  }
+  case RIGHT_MODE: {
+    refcolumn =
+        -Xpos + ((xsize - size) * DrawProp[DrawProp->LcdLayer].pFont->Width);
+    break;
+  }
+  default: {
+    refcolumn = Xpos;
+    break;
+  }
   }
 
   /* Check that the Start column is located in the screen */
@@ -651,7 +651,8 @@ void UTIL_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius,
     e2 = err;
     if (e2 <= x_pos) {
       err += ++x_pos * 2 + 1;
-      if (-y_pos == x_pos && e2 <= y_pos) e2 = 0;
+      if (-y_pos == x_pos && e2 <= y_pos)
+        e2 = 0;
     }
     if (e2 > y_pos) {
       err += ++y_pos * 2 + 1;
@@ -870,9 +871,11 @@ void UTIL_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius,
     e2 = err;
     if (e2 <= x_pos) {
       err += ++x_pos * 2 + 1;
-      if (-y_pos == x_pos && e2 <= y_pos) e2 = 0;
+      if (-y_pos == x_pos && e2 <= y_pos)
+        e2 = 0;
     }
-    if (e2 > y_pos) err += ++y_pos * 2 + 1;
+    if (e2 > y_pos)
+      err += ++y_pos * 2 + 1;
   } while (y_pos <= 0);
 }
 
@@ -899,18 +902,18 @@ static void DrawChar(uint32_t Xpos, uint32_t Ypos, const uint8_t *pData) {
     pchar = ((uint8_t *)pData + (width + 7) / 8 * i);
 
     switch (((width + 7) / 8)) {
-      case 1:
-        line = pchar[0];
-        break;
+    case 1:
+      line = pchar[0];
+      break;
 
-      case 2:
-        line = (pchar[0] << 8) | pchar[1];
-        break;
+    case 2:
+      line = (pchar[0] << 8) | pchar[1];
+      break;
 
-      case 3:
-      default:
-        line = (pchar[0] << 16) | (pchar[1] << 8) | pchar[2];
-        break;
+    case 3:
+    default:
+      line = (pchar[0] << 16) | (pchar[1] << 8) | pchar[2];
+      break;
     }
 
     if (DrawProp[DrawProp->LcdLayer].LcdPixelFormat ==
