@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * File Name          : GTZC.c
+ * File Name          : CRC.h
  * Description        : This file provides code for the configuration
- *                      of the GTZC instances.
+ *                      of the CRC instances.
  ******************************************************************************
  * @attention
  *
@@ -16,19 +16,43 @@
  *
  ******************************************************************************
  */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __crc_H
+#define __crc_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "gtzc.h"
+#include "main.h"
 
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN Includes */
 
-/* USER CODE END 0 */
+/* USER CODE END Includes */
 
-/* GTZC init function */
-void MX_GTZC_Init(void) {}
+extern CRC_HandleTypeDef hcrc;
 
-/* USER CODE BEGIN 1 */
+/* USER CODE BEGIN Private defines */
 
-/* USER CODE END 1 */
+/* USER CODE END Private defines */
+
+void MX_CRC_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+/* USER CODE END Prototypes */
+
+#ifdef __cplusplus
+}
+#endif
+#endif /*__ crc_H */
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

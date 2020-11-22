@@ -2,9 +2,7 @@
  ******************************************************************************
  * @file    stm32l5xx_hal_conf.h
  * @author  MCD Application Team
- * @brief   HAL configuration template file.
- *          This file should be copied to the application folder and renamed
- *          to stm32l5xx_hal_conf.h.
+ * @brief   HAL configuration file.
  ******************************************************************************
  * @attention
  *
@@ -37,12 +35,12 @@ extern "C" {
 #define HAL_MODULE_ENABLED
 /*#define HAL_ADC_MODULE_ENABLED   */
 /*#define HAL_COMP_MODULE_ENABLED   */
-/*#define HAL_CRC_MODULE_ENABLED   */
+#define HAL_CRC_MODULE_ENABLED
 /*#define HAL_CRYP_MODULE_ENABLED   */
 /*#define HAL_DAC_MODULE_ENABLED   */
 #define HAL_DFSDM_MODULE_ENABLED
 /*#define HAL_FDCAN_MODULE_ENABLED   */
-#define HAL_GTZC_MODULE_ENABLED
+/*#define HAL_GTZC_MODULE_ENABLED   */
 /*#define HAL_HASH_MODULE_ENABLED   */
 /*#define HAL_I2C_MODULE_ENABLED   */
 /*#define HAL_IRDA_MODULE_ENABLED   */
@@ -78,7 +76,6 @@ extern "C" {
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
-
 #define HAL_ICACHE_MODULE_ENABLED
 
 /* ########################## Oscillator Values adaptation

@@ -21,11 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "crc.h"
 #include "dfsdm.h"
 #include "dma.h"
 #include "fmc.h"
 #include "gpio.h"
-#include "gtzc.h"
 #include "octospi.h"
 #include "tim.h"
 
@@ -106,9 +106,6 @@ int main(void) {
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* GTZC initialisation */
-  MX_GTZC_Init();
-
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -122,6 +119,7 @@ int main(void) {
   MX_TIM4_Init();
   MX_TIM16_Init();
   MX_TIM17_Init();
+  MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
   /* Start DFSDM conversions */
