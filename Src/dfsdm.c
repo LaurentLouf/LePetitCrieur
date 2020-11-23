@@ -191,6 +191,13 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
   }
 }
 
+/**
+ * \brief
+ *
+ * \param dfsdm_channelHandle
+ *
+ * Called by HAL_DFSDM_ChannelInit
+ */
 void HAL_DFSDM_ChannelMspInit(
     DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
