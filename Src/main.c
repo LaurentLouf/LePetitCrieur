@@ -78,6 +78,7 @@ void LCD_DeInit(void);
 void LCD_Display_Microphone_Info_Init(void);
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
                                         uint32_t i_tick_begin);
+void turn_off_user_leds(void);
 
 /* USER CODE END PFP */
 
@@ -162,6 +163,7 @@ int main(void) {
 
       // If there's no action currently performed, go back to sleep
       if (flag_save_buffer == false && flag_display_lcd_info == false) {
+        turn_off_user_leds();
         HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
       }
     }
@@ -254,6 +256,11 @@ void LCD_DeInit(void) {
   if (BSP_LCD_DeInit(0) != BSP_ERROR_NONE) {
     Error_Handler();
   }
+}
+
+void turn_off_user_leds(void) {
+  HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 }
 
 /**
