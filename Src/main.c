@@ -55,8 +55,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define SaturateLowHigh(number, low, high)                                     \
-  (((number) < (low)) ? (low) : (((number) > (high)) ? (high) : (number)))
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
