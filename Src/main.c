@@ -45,11 +45,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define RECORD_BUFFER_SIZE 2048 //!< Maximum number of samples for FFT is 1024
-#define NUMBER_BUFFER_SAVE                                                     \
-  323 //!< We want to save 15s of sound after first detection of high noise.
-      //!< We're sampling at 44.1kHz, which thus requires 661500 samples, or
-      //!< 323 buffers of 2048 samples.
+#define RECORD_BUFFER_SIZE 2048  //!< Maximum number of samples for FFT is 1024
+#define NUMBER_BUFFER_SAVE \
+  323  //!< We want to save 15s of sound after first detection of high noise.
+       //!< We're sampling at 44.1kHz, which thus requires 661500 samples, or
+       //!< 323 buffers of 2048 samples.
 
 /* USER CODE END PD */
 
