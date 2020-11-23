@@ -74,6 +74,7 @@ bool flag_display_lcd_info = false;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void LCD_Init(void);
+void LCD_DeInit(void);
 void LCD_Display_Microphone_Info_Init(void);
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
                                         uint32_t i_tick_begin);
@@ -123,7 +124,8 @@ int main(void) {
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Start DFSDM conversions */
+  LCD_DeInit();
+  // Start DFSDM conversions
   if (HAL_OK != HAL_DFSDM_FilterRegularStart_DMA(
                     &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
     Error_Handler();
@@ -155,7 +157,7 @@ int main(void) {
 
       // If the display is no longer needed, turn it off
       if (flag_display_lcd_info == false) {
-        BSP_LCD_DisplayOff(0);
+        LCD_DeInit();
       }
 
       // If there's no action currently performed, go back to sleep
@@ -246,6 +248,14 @@ void LCD_Init(void) {
     Error_Handler();
   }
 }
+
+void LCD_DeInit(void) {
+  /* Deinitialize the LCD */
+  if (BSP_LCD_DeInit(0) != BSP_ERROR_NONE) {
+    Error_Handler();
+  }
+}
+
 /**
  * @brief  Half regular conversion complete callback.
  * @param  hdfsdm_filter : DFSDM filter handle.
