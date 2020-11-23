@@ -82,7 +82,7 @@ void MX_DFSDM1_Init(void) {
   hdsfdm1_awd.DataSource = DFSDM_FILTER_AWD_FILTER_DATA;
   hdsfdm1_awd.Channel =
       DFSDM_CHANNEL_0 | DFSDM_CHANNEL_1 | DFSDM_CHANNEL_2 | DFSDM_CHANNEL_3;
-  hdsfdm1_awd.HighThreshold = 1000;
+  hdsfdm1_awd.HighThreshold = 5000;
   hdsfdm1_awd.LowThreshold = -8388608;
   hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
   hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
