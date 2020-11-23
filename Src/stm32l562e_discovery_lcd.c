@@ -58,6 +58,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l562e_discovery_lcd.h"
 
+#include <stdbool.h>
+
 /** @addtogroup BSP
  * @{
  */
@@ -77,12 +79,18 @@
 #define LCD_POWER_GPIO_PORT GPIOH
 #define LCD_POWER_GPIO_PIN GPIO_PIN_0
 #define LCD_POWER_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOH_CLK_ENABLE()
+#define LCD_POWER_GPIO_CLOCK_DISABLE() __HAL_RCC_GPIOH_CLK_DISABLE()
+#define LCD_POWER_GPIO_CLOCK_IS_DISABLED() __HAL_RCC_GPIOH_IS_CLK_DISABLED()
 #define LCD_RESET_GPIO_PORT GPIOF
 #define LCD_RESET_GPIO_PIN GPIO_PIN_14
 #define LCD_RESET_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LCD_RESET_GPIO_CLOCK_DISABLE() __HAL_RCC_GPIOF_CLK_DISABLE()
+#define LCD_RESET_GPIO_CLOCK_IS_DISABLED() __HAL_RCC_GPIOF_IS_CLK_DISABLED()
 #define LCD_BACKLIGHT_GPIO_PORT GPIOE
 #define LCD_BACKLIGHT_GPIO_PIN GPIO_PIN_1
 #define LCD_BACKLIGHT_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define LCD_BACKLIGHT_GPIO_CLOCK_DISABLE() __HAL_RCC_GPIOE_CLK_DISABLE()
+#define LCD_BACKLIGHT_GPIO_CLOCK_IS_DISABLED() __HAL_RCC_GPIOE_IS_CLK_DISABLED()
 
 #define LCD_REGISTER_ADDR FMC_BANK1_1
 #define LCD_DATA_ADDR (FMC_BANK1_1 | 0x00000002UL)
@@ -753,15 +761,48 @@ static void ST7789H2_PowerUp(void) {
  * @retval BSP status.
  */
 static void ST7789H2_PowerDown(void) {
-  /* Deactivate backlight */
+  GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* Initialize GPIO for backlight control and deactivate backlight */
+  bool disable_clock = LCD_BACKLIGHT_GPIO_CLOCK_IS_DISABLED();
+  LCD_BACKLIGHT_GPIO_CLOCK_ENABLE();
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Pin = LCD_BACKLIGHT_GPIO_PIN;
+  HAL_GPIO_Init(LCD_BACKLIGHT_GPIO_PORT, &GPIO_InitStruct);
   HAL_GPIO_WritePin(LCD_BACKLIGHT_GPIO_PORT, LCD_BACKLIGHT_GPIO_PIN,
                     GPIO_PIN_RESET);
+  if (disable_clock) {
+    LCD_BACKLIGHT_GPIO_CLOCK_DISABLE();
+  }
 
-  /* Reset the ST7789H2 */
+  /* Initialize the ST7789H2 reset pin and reset the ST7789H2 */
+  disable_clock = LCD_RESET_GPIO_CLOCK_IS_DISABLED();
+  LCD_RESET_GPIO_CLOCK_ENABLE();
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Pin = LCD_RESET_GPIO_PIN;
+  HAL_GPIO_Init(LCD_RESET_GPIO_PORT, &GPIO_InitStruct);
   HAL_GPIO_WritePin(LCD_RESET_GPIO_PORT, LCD_RESET_GPIO_PIN, GPIO_PIN_RESET);
+  if (disable_clock) {
+    LCD_RESET_GPIO_CLOCK_DISABLE();
+  }
 
-  /* Power down the ST7789H2 */
+  /* Initialize and configure the ST7789H2 power pin and power down the ST7789H2
+   */
+  disable_clock = LCD_POWER_GPIO_CLOCK_IS_DISABLED();
+  LCD_POWER_GPIO_CLOCK_ENABLE();
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Pin = LCD_POWER_GPIO_PIN;
+  HAL_GPIO_Init(LCD_POWER_GPIO_PORT, &GPIO_InitStruct);
   HAL_GPIO_WritePin(LCD_POWER_GPIO_PORT, LCD_POWER_GPIO_PIN, GPIO_PIN_SET);
+  if (disable_clock) {
+    LCD_POWER_GPIO_CLOCK_DISABLE();
+  }
 }
 
 /**
