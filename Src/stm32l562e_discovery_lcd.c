@@ -178,9 +178,12 @@ int32_t BSP_LCD_DeInit(uint32_t Instance) {
     status = BSP_ERROR_WRONG_PARAM;
   } else {
     /* De-Init the LCD driver */
-    if (Lcd_Drv[Instance]->DeInit(Lcd_CompObj[Instance]) < 0) {
+    if (Lcd_Drv[Instance] != NULL &&
+        Lcd_Drv[Instance]->DeInit(Lcd_CompObj[Instance]) < 0) {
       status = BSP_ERROR_COMPONENT_FAILURE;
     }
+    Lcd_Drv[Instance] = NULL;
+
     /* Power down LCD */
     ST7789H2_PowerDown();
   }
