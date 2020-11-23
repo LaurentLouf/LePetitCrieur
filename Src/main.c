@@ -31,6 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -60,11 +61,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 int32_t record_buffer[RECORD_BUFFER_SIZE];
 __IO uint32_t DmaRecHalfBuffCplt = 0;
 __IO uint32_t DmaRecBuffCplt = 0;
-GPIO_TypeDef *GPIO_port_toggle;
-uint16_t GPIO_Pin_port_toggle;
+uint16_t number_half_buffer_saved;
+bool flag_save_buffer = false;
+bool flag_display_lcd_info = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,36 +124,44 @@ int main(void) {
   /* USER CODE BEGIN 2 */
 
   /* Start DFSDM conversions */
-  LCD_Init();
-  LCD_Display_Microphone_Info_Init();
   if (HAL_OK != HAL_DFSDM_FilterRegularStart_DMA(
                     &hdfsdm1_filter0, record_buffer, RECORD_BUFFER_SIZE)) {
     Error_Handler();
   }
-  GPIO_port_toggle = LED_GREEN_GPIO_Port;
-  GPIO_Pin_port_toggle = LED_GREEN_Pin;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t max_absolute_value = 0;
   while (1) {
     if (DmaRecHalfBuffCplt == 1 || DmaRecBuffCplt == 1) {
-      uint16_t i_first_sample = 0;
+      uint16_t i_start_save_buffer = 0;
       if (DmaRecBuffCplt == 1) {
-        i_first_sample = RECORD_BUFFER_SIZE / 2;
+        i_start_save_buffer = 0;
         DmaRecBuffCplt = 0;
-        HAL_GPIO_TogglePin(GPIO_port_toggle, GPIO_Pin_port_toggle);
       } else {
+        i_start_save_buffer = RECORD_BUFFER_SIZE / 2;
         DmaRecHalfBuffCplt = 0;
       }
-      uint32_t channel;
-      uint32_t tick_begin;
-      tick_begin = HAL_GetTick();
-      int32_t max_value =
-          HAL_DFSDM_FilterGetExdMaxValue(&hdfsdm1_filter0, &channel);
-      LCD_Display_Microphone_Info_Update(max_value, tick_begin);
-      max_absolute_value = 0;
+
+      // Perform actions when it's required to save the record buffers
+      if (flag_save_buffer == true) {
+        // save buffer
+        HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        number_half_buffer_saved++;
+        if (number_half_buffer_saved == 2 * NUMBER_BUFFER_SAVE) {
+          flag_save_buffer = false;
+        }
+      }
+
+      // If the display is no longer needed, turn it off
+      if (flag_display_lcd_info == false) {
+        BSP_LCD_DisplayOff(0);
+      }
+
+      // If there's no action currently performed, go back to sleep
+      if (flag_save_buffer == false && flag_display_lcd_info == false) {
+        HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      }
     }
     /* USER CODE END WHILE */
 
@@ -300,8 +311,11 @@ void HAL_DFSDM_FilterRegConvCpltCallback(
  */
 void HAL_DFSDM_FilterAwdCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter,
                                  uint32_t Channel, uint32_t Threshold) {
-  GPIO_port_toggle = LED_RED_GPIO_Port;
-  GPIO_Pin_port_toggle = LED_RED_Pin;
+  if (hdfsdm_filter == &hdfsdm1_filter0 && Channel == 1 &&
+      flag_save_buffer == false) {
+    flag_save_buffer = true;
+    number_half_buffer_saved = 0;
+  }
 }
 
 /* USER CODE END 4 */
