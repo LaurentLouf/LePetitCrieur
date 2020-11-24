@@ -34,7 +34,6 @@ Src/octospi.c \
 Src/stm32l5xx_hal_msp.c \
 Src/stm32l5xx_it.c \
 Src/system_stm32l5xx.c \
-Src/tim.c \
 Src/st7789h2.c \
 Src/st7789h2_reg.c \
 Src/stm32l562e_discovery_lcd.c \
