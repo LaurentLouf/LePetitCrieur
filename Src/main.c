@@ -119,9 +119,6 @@ int main(void) {
   MX_DFSDM1_Init();
   MX_FMC_Init();
   MX_OCTOSPI1_Init();
-  MX_TIM4_Init();
-  MX_TIM16_Init();
-  MX_TIM17_Init();
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
