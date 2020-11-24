@@ -161,7 +161,9 @@ int main(void) {
       // If there's no action currently performed, go back to sleep
       if (flag_save_buffer == false && flag_display_lcd_info == false) {
         turn_off_user_leds();
+        HAL_NVIC_DisableIRQ(DMA1_Channel4_IRQn);
         HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+        HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
       }
     }
     /* USER CODE END WHILE */
