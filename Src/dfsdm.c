@@ -34,15 +34,16 @@ DMA_HandleTypeDef hdma_dfsdm1_flt0;
  * The MEMS microphone uses the clock provided by the DFSDM. It can uses clock
  * frequencies from 351kHz to 4.8MHz. So we enable the output clock and use a
  * prescaer value of 4 to get a frequency of
- * 11.294MHz (clock used by DFSDM) / 4 = 2.8235MHz, right in the range.
+ * 11.294MHz (clock used by DFSDM) / 4 = 2.8235MHz, right in the range. Using 64
+ * as oversampling value gives a final sampling frequency of 44.117kHz
  *
  * For the filter, a 3rd order filter and an oversampling of 64 samples gives an
  * output resolution of 1+3*log2(64) = 19 bits. For use of the data, see the
  * reference manual for DFSDM_FLTxJDATAR registers : only the 24MSB make the
  * sample data, the first 8 LSB only contain the DFSDM channel.
  *
- * The filter for the analog watchdog (awd) is also initialized but not the
- * analog watchdog itself (thresholds).
+ * The filter for the analog watchdog (awd) is also initialized then the analog
+ * watchdog itself is started along with the extremes detector.
  */
 void MX_DFSDM1_Init(void) {
   hdfsdm1_filter0.Instance = DFSDM1_Filter0;
