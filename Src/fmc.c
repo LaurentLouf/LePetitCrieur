@@ -243,6 +243,11 @@ void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *sramHandle) {
 
   /* USER CODE END SRAM_MspDeInit 1 */
 }
+
+/* USER CODE BEGIN 1 */
+void MX_FMC_DeInit(void) { HAL_SRAM_DeInit(&hsram1); }
+/* USER CODE END 1 */
+
 /**
  * @}
  */

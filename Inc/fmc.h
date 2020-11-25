@@ -41,7 +41,7 @@ void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram);
 void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *hsram);
 
 /* USER CODE BEGIN Prototypes */
-
+void MX_FMC_DeInit(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
