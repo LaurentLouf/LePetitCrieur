@@ -27,7 +27,16 @@ static uint32_t FMC_DeInitialized = 0;
 
 SRAM_HandleTypeDef hsram1;
 
-/* FMC initialization function */
+/**
+ * \brief FMC initialization function
+ *
+ * The initialization sequence is ass follow :
+ *  - Thie function is called by the main
+ *  - It calls HAL_SRAM_Init
+ *  - Which in turn will call HAL_SRAM_MspInit
+ *  - Which finally calls HAL_FMC_MspInit
+ *
+ */
 void MX_FMC_Init(void) {
   FMC_NORSRAM_TimingTypeDef Timing = {0};
 
@@ -242,6 +251,15 @@ void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *sramHandle) {
 }
 
 /* USER CODE BEGIN 1 */
+/**
+ * \brief FMC deinitialization function
+ *
+ * The deinitiaization sequence is as follows :
+ *  - It calls HAL_SRAM_DeInit
+ *  - Which in turn will call HAL_SRAM_MspDeInit
+ *  - Which finally calls HAL_FMC_MspDeInit
+ *
+ */
 void MX_FMC_DeInit(void) { HAL_SRAM_DeInit(&hsram1); }
 /* USER CODE END 1 */
 
@@ -253,4 +271,5 @@ void MX_FMC_DeInit(void) { HAL_SRAM_DeInit(&hsram1); }
  * @}
  */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF
+   FILE****/
