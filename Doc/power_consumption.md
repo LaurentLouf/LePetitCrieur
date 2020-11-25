@@ -3,6 +3,7 @@
 - [Power consumption](#power-consumption)
   - [Base consumption](#base-consumption)
   - [Consumption with code at commit fc5c498e](#consumption-with-code-at-commit-fc5c498e)
+  - [Consumption with code at commit 4c3d4209](#consumption-with-code-at-commit-4c3d4209)
 
 ## Base consumption
 
@@ -41,6 +42,26 @@ In that configuration, the power consumption measured with STM32CubeMonitor-Powe
 - The asleep phase oscillates betwwen 10.5mA and 16.5mA
 
 The optimization efforts will focus on the asleep phase since the system will spend most of its time in this mode (100 noisy events of 15s per day : 1500s active out of 86400s in a day so a very conservative estimate is at least 95% of the time spent in this mode).
+
+The code was compiled with the following flags
+
+```
+DEBUG = 1
+OPT = -O0
+```
+
+## Consumption with code at commit 4c3d4209
+
+The power consumption optimization features added are :
+
+- Deactivate the FMC when going into sleep mode
+
+As mentionned before, we will focus in a first time on the consumption during the asleep mode. In that configuration, the power consumption measured with STM32CubeMonitor-Power is the following for this phase
+![Power consumption in basic configuration](images/power_4c3d4209.png)
+
+- The average value is around 14.5mA
+- During a short period of time (approx 700µs), the consumption goes down to 8.75mA
+- During an even shorter period of time, the consumption reaches 17.5mA
 
 The code was compiled with the following flags
 
