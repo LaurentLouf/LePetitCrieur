@@ -78,6 +78,8 @@ void LCD_Display_Microphone_Info_Init(void);
 void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
                                         uint32_t i_tick_begin);
 void turn_off_user_leds(void);
+void enter_low_power_mode(void);
+void exit_low_power_mode(void);
 
 /* USER CODE END PFP */
 
@@ -161,10 +163,9 @@ int main(void) {
 
       // If there's no action currently performed, go back to sleep
       if (flag_save_buffer == false && flag_display_lcd_info == false) {
-        turn_off_user_leds();
-        HAL_NVIC_DisableIRQ(DMA1_Channel4_IRQn);
-        HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-        HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+        enter_low_power_mode();
+        // System will be waken up by interrupt
+        exit_low_power_mode();
       }
     }
     /* USER CODE END WHILE */
@@ -270,6 +271,18 @@ void LCD_DeInit(void) {
 void turn_off_user_leds(void) {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+}
+
+void enter_low_power_mode(void) {
+  turn_off_user_leds();
+  HAL_NVIC_DisableIRQ(DMA1_Channel4_IRQn);
+  MX_FMC_DeInit();
+  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+}
+
+void exit_low_power_mode(void) {
+  MX_FMC_Init();
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
 }
 
 /**
