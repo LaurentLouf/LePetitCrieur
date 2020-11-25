@@ -21,7 +21,8 @@
 #include "fmc.h"
 
 /* USER CODE BEGIN 0 */
-
+static uint32_t FMC_Initialized = 0;
+static uint32_t FMC_DeInitialized = 0;
 /* USER CODE END 0 */
 
 SRAM_HandleTypeDef hsram1;
@@ -67,8 +68,6 @@ void MX_FMC_Init(void) {
     Error_Handler();
   }
 }
-
-static uint32_t FMC_Initialized = 0;
 
 static void HAL_FMC_MspInit(void) {
   /* USER CODE BEGIN FMC_MspInit 0 */
@@ -153,7 +152,7 @@ static void HAL_FMC_MspInit(void) {
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* USER CODE BEGIN FMC_MspInit 1 */
-
+  FMC_DeInitialized = 0;
   /* USER CODE END FMC_MspInit 1 */
 }
 
@@ -166,8 +165,6 @@ void HAL_SRAM_MspInit(SRAM_HandleTypeDef *sramHandle) {
 
   /* USER CODE END SRAM_MspInit 1 */
 }
-
-static uint32_t FMC_DeInitialized = 0;
 
 static void HAL_FMC_MspDeInit(void) {
   /* USER CODE BEGIN FMC_MspDeInit 0 */
@@ -230,7 +227,7 @@ static void HAL_FMC_MspDeInit(void) {
                              GPIO_PIN_9 | GPIO_PIN_13);
 
   /* USER CODE BEGIN FMC_MspDeInit 1 */
-
+  FMC_Initialized = 0;
   /* USER CODE END FMC_MspDeInit 1 */
 }
 
