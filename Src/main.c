@@ -277,10 +277,12 @@ void enter_low_power_mode(void) {
   MX_FMC_DeInit();
   MX_OCTOSPI1_DeInit();
   MX_CRC_DeInit();
+  HAL_SuspendTick();
   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
 void exit_low_power_mode(void) {
+  HAL_ResumeTick();
   MX_FMC_Init();
   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
   MX_OCTOSPI1_Init();
