@@ -4,6 +4,7 @@
   - [Base consumption](#base-consumption)
   - [Consumption with code at commit fc5c498e](#consumption-with-code-at-commit-fc5c498e)
   - [Consumption with code at commit 4c3d4209](#consumption-with-code-at-commit-4c3d4209)
+  - [Consumption with code at commit 39529eb9](#consumption-with-code-at-commit-39529eb9)
 
 ## Base consumption
 
@@ -62,6 +63,29 @@ As mentionned before, we will focus in a first time on the consumption during th
 - The average value is around 14.5mA
 - During a short period of time (approx 700µs), the consumption goes down to 8.75mA
 - During an even shorter period of time, the consumption reaches 17.5mA
+
+The code was compiled with the following flags
+
+```
+DEBUG = 1
+OPT = -O0
+```
+
+## Consumption with code at commit 39529eb9
+
+The power consumption optimization features added are :
+
+- Deactivate the CRC and OctoSPI when going into sleep mode
+- Remove all unused pins initialization
+- Disable the system ticks when going into sleep to avoid periodic wakeups
+
+In that configuration, the power consumption measured with STM32CubeMonitor-Power is the following
+![Power consumption in basic configuration](images/power_39529eb9.png)
+
+- The consumption during the sleep phase is now approximately constant (removal of period wake ups)
+- The consumption during the sleep phase has decreased from 8.75mA to 7.35mA (deactivation of peripherals)
+
+A coarse estimation of the battery life with a battery of 3000mAh gives 2 weeks, which is a good first milestone.
 
 The code was compiled with the following flags
 
