@@ -26,9 +26,14 @@
 
 OSPI_HandleTypeDef hospi1;
 
-/* OCTOSPI1 init function */
+/**
+ * \briefOCTOSPI1 init function
+ *
+ * Initialize the parameters of the OctoSPI interface then calls HAL_OSPI_Init
+ * which in turn calls HAL_OSPI_MspInit
+ *
+ */
 void MX_OCTOSPI1_Init(void) {
-
   hospi1.Instance = OCTOSPI1;
   hospi1.Init.FifoThreshold = 1;
   hospi1.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
@@ -50,7 +55,6 @@ void MX_OCTOSPI1_Init(void) {
 }
 
 void HAL_OSPI_MspInit(OSPI_HandleTypeDef *ospiHandle) {
-
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if (ospiHandle->Instance == OCTOSPI1) {
@@ -118,8 +122,16 @@ void HAL_OSPI_MspInit(OSPI_HandleTypeDef *ospiHandle) {
   }
 }
 
+/**
+ * \brief De initialize the lower layer of the OctoSPI interface
+ *
+ * \param ospiHandle
+ *
+ * Disable the clock used by the OctoSPI interface then deinitializes the GPIO
+ * which will put the GPIO in analog output to preserve energy
+ *
+ */
 void HAL_OSPI_MspDeInit(OSPI_HandleTypeDef *ospiHandle) {
-
   if (ospiHandle->Instance == OCTOSPI1) {
     /* USER CODE BEGIN OCTOSPI1_MspDeInit 0 */
 
@@ -153,7 +165,11 @@ void HAL_OSPI_MspDeInit(OSPI_HandleTypeDef *ospiHandle) {
 }
 
 /* USER CODE BEGIN 1 */
-
+/**
+ * \brief De initialize the OctoSPI interface
+ *
+ */
+void MX_OCTOSPI1_DeInit(void) { HAL_OSPI_MspDeInit(&hospi1); }
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -26,9 +26,15 @@
 
 CRC_HandleTypeDef hcrc;
 
-/* CRC init function */
+/**
+ * \brief CRC init function
+ *
+ * Initialize the parameters for the CRC then calls HAL_CRC_Init which will in
+ * turn call HAL_CRC_MspInit to initialize the low layer stuff needed for the
+ * CRC
+ *
+ */
 void MX_CRC_Init(void) {
-
   hcrc.Instance = CRC;
   hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
   hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
@@ -41,7 +47,6 @@ void MX_CRC_Init(void) {
 }
 
 void HAL_CRC_MspInit(CRC_HandleTypeDef *crcHandle) {
-
   if (crcHandle->Instance == CRC) {
     /* USER CODE BEGIN CRC_MspInit 0 */
 
@@ -55,7 +60,6 @@ void HAL_CRC_MspInit(CRC_HandleTypeDef *crcHandle) {
 }
 
 void HAL_CRC_MspDeInit(CRC_HandleTypeDef *crcHandle) {
-
   if (crcHandle->Instance == CRC) {
     /* USER CODE BEGIN CRC_MspDeInit 0 */
 
@@ -69,7 +73,11 @@ void HAL_CRC_MspDeInit(CRC_HandleTypeDef *crcHandle) {
 }
 
 /* USER CODE BEGIN 1 */
-
+/**
+ * \brief Deinitialize the CRC
+ *
+ */
+void MX_CRC_DeInit(void) { HAL_CRC_MspDeInit(&hcrc); }
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
