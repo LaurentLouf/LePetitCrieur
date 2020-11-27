@@ -358,11 +358,13 @@ void enter_low_power_mode(void) {
   MX_FMC_DeInit();
   MX_OCTOSPI1_DeInit();
   MX_CRC_DeInit();
+  change_system_clock_to_low_power();
   HAL_SuspendTick();
   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
 void exit_low_power_mode(void) {
+  SystemClock_Config();
   HAL_ResumeTick();
   MX_FMC_Init();
   MX_DMA_Init();
