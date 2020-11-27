@@ -80,15 +80,7 @@ void MX_DFSDM1_Init(void) {
   }
 
   /* USER CODE BEGIN MX_DFSDM1_Init */
-  DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
-  hdsfdm1_awd.Channel = DFSDM_CHANNEL_1;
-  hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
-  hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
-  DFSDM_set_analog_watchdog_thresholds(&hdsfdm1_awd, 5000, -8388608);
-
-  if (HAL_DFSDM_FilterAwdStart_IT(&hdfsdm1_filter0, &hdsfdm1_awd) != HAL_OK) {
-    Error_Handler();
-  }
+  DFSDM_activate_analog_watchdog(5000, -8388000);
 
   if (HAL_DFSDM_FilterExdStart(&hdfsdm1_filter0, DFSDM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
@@ -153,9 +145,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
-    /* DFSDM1 interrupt Init */
-    HAL_NVIC_SetPriority(DFSDM1_FLT0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DFSDM1_FLT0_IRQn);
+
     /* USER CODE END DFSDM1_MspInit 1 */
     DFSDM1_Init++;
   }
@@ -250,9 +240,6 @@ void HAL_DFSDM_ChannelMspInit(
     GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* DFSDM1 interrupt Init */
-    HAL_NVIC_SetPriority(DFSDM1_FLT0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DFSDM1_FLT0_IRQn);
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
     /* USER CODE END DFSDM1_MspInit 1 */
@@ -352,6 +339,30 @@ void DFSDM_set_analog_watchdog_thresholds(
     io_dfsdm_analog_watchdog_parameters->HighThreshold = i_high_threshold;
     io_dfsdm_analog_watchdog_parameters->LowThreshold = i_low_threshold;
   }
+}
+
+void DFSDM_activate_analog_watchdog(int32_t i_high_threshold,
+                                    int32_t i_low_threshold) {
+  DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
+  hdsfdm1_awd.DataSource = DFSDM_FILTER_AWD_CHANNEL_DATA;
+  hdsfdm1_awd.Channel = DFSDM_CHANNEL_1;
+  hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
+  hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
+  DFSDM_set_analog_watchdog_thresholds(&hdsfdm1_awd, i_high_threshold,
+                                       i_low_threshold);
+
+  if (HAL_DFSDM_FilterAwdStart_IT(&hdfsdm1_filter0, &hdsfdm1_awd) != HAL_OK) {
+    Error_Handler();
+  }
+
+  /* DFSDM1 interrupt Init */
+  HAL_NVIC_SetPriority(DFSDM1_FLT0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DFSDM1_FLT0_IRQn);
+}
+
+void DFSDM_deactivate_analog_watchdog(void) {
+  HAL_DFSDM_FilterAwdStop_IT(&hdfsdm1_filter0);
+  HAL_NVIC_DisableIRQ(DFSDM1_FLT0_IRQn);
 }
 /* USER CODE END 1 */
 
