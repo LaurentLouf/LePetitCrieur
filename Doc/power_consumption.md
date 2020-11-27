@@ -5,6 +5,7 @@
   - [Consumption with code at commit fc5c498e](#consumption-with-code-at-commit-fc5c498e)
   - [Consumption with code at commit 4c3d4209](#consumption-with-code-at-commit-4c3d4209)
   - [Consumption with code at commit 39529eb9](#consumption-with-code-at-commit-39529eb9)
+  - [Consumption with code at commit 8b27f1d1](#consumption-with-code-at-commit-8b27f1d1)
 
 ## Base consumption
 
@@ -86,6 +87,27 @@ In that configuration, the power consumption measured with STM32CubeMonitor-Powe
 - The consumption during the sleep phase has decreased from 8.75mA to 7.35mA (deactivation of peripherals)
 
 A coarse estimation of the battery life with a battery of 3000mAh gives 2 weeks, which is a good first milestone.
+
+The code was compiled with the following flags
+
+```
+DEBUG = 1
+OPT = -O0
+```
+
+## Consumption with code at commit 8b27f1d1
+
+The power consumption optimization features added are :
+
+- Deactivation of the DMA for the DFSDM when entering sleep phase
+
+In that configuration, the power consumption measured with STM32CubeMonitor-Power is the following
+![Power consumption in basic configuration](images/power_39529eb9.png)
+
+- The consumption during the sleep phase oscillates with an amplitude of 2.5mA
+- The average consumption during the sleep phase has decreased from 7.35mA to 5.8mA
+
+A coarse estimation of the battery life with a battery of 3000mAh gives 3 weeks.
 
 The code was compiled with the following flags
 
