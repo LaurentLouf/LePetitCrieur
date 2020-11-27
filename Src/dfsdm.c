@@ -112,7 +112,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
     PeriphClkInit.PeriphClockSelection =
         RCC_PERIPHCLK_DFSDM1AUDIO | RCC_PERIPHCLK_SAI1 | RCC_PERIPHCLK_DFSDM1;
     PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
-    PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK2;
+    PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_SYSCLK;
     PeriphClkInit.Dfsdm1AudioClockSelection = RCC_DFSDM1AUDIOCLKSOURCE_SAI1;
     PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSAI1SOURCE_MSI;
     PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
@@ -210,7 +210,7 @@ void HAL_DFSDM_ChannelMspInit(
     PeriphClkInit.PeriphClockSelection =
         RCC_PERIPHCLK_DFSDM1AUDIO | RCC_PERIPHCLK_SAI1 | RCC_PERIPHCLK_DFSDM1;
     PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
-    PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK2;
+    PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_SYSCLK;
     PeriphClkInit.Dfsdm1AudioClockSelection = RCC_DFSDM1AUDIOCLKSOURCE_SAI1;
     PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSAI1SOURCE_MSI;
     PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
