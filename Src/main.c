@@ -273,7 +273,8 @@ void turn_off_user_leds(void) {
 
 void enter_low_power_mode(void) {
   turn_off_user_leds();
-  HAL_NVIC_DisableIRQ(DMA1_Channel4_IRQn);
+  HAL_DFSDM_FilterRegularStop_DMA(&hdfsdm1_filter0);
+  MX_DMA_DeInit();
   MX_FMC_DeInit();
   MX_OCTOSPI1_DeInit();
   MX_CRC_DeInit();
@@ -284,7 +285,9 @@ void enter_low_power_mode(void) {
 void exit_low_power_mode(void) {
   HAL_ResumeTick();
   MX_FMC_Init();
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  MX_DMA_Init();
+  HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, record_buffer,
+                                   RECORD_BUFFER_SIZE);
   MX_OCTOSPI1_Init();
   MX_CRC_Init();
 }
