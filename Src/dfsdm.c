@@ -21,7 +21,7 @@
 #include "dfsdm.h"
 
 /* USER CODE BEGIN 0 */
-DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
+
 /* USER CODE END 0 */
 
 DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
@@ -80,13 +80,11 @@ void MX_DFSDM1_Init(void) {
   }
 
   /* USER CODE BEGIN MX_DFSDM1_Init */
-  hdsfdm1_awd.DataSource = DFSDM_FILTER_AWD_FILTER_DATA;
-  hdsfdm1_awd.Channel =
-      DFSDM_CHANNEL_0 | DFSDM_CHANNEL_1 | DFSDM_CHANNEL_2 | DFSDM_CHANNEL_3;
-  hdsfdm1_awd.HighThreshold = 5000;
-  hdsfdm1_awd.LowThreshold = -8388608;
+  DFSDM_Filter_AwdParamTypeDef hdsfdm1_awd;
+  hdsfdm1_awd.Channel = DFSDM_CHANNEL_1;
   hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
   hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
+  HAL_DFSDM_set_analog_watchdog_thresholds(&hdsfdm1_awd, 5000, -8388608);
 
   if (HAL_DFSDM_FilterAwdStart_IT(&hdfsdm1_filter0, &hdsfdm1_awd) != HAL_OK) {
     Error_Handler();
@@ -316,7 +314,45 @@ void HAL_DFSDM_ChannelMspDeInit(
 }
 
 /* USER CODE BEGIN 1 */
+/**
+ * \brief Set the analog watchdog thresholds
+ *
+ * \param[inout] io_dfsdm_analog_watchdog_parameters Structure containing the
+ * parameters of the analog watchdog
+ * \param[in] i_high_threshold Value for the high threshold
+ * \param[in] i_low_threshold Value for the low threshold
+ *
+ * Set the analog watchdog thresholds using two different way to set the values,
+ * depending on where the data is coming from. If the data come the DFSDM
+ * filter, the thresholds are considered on 24 bits. But if the data comes from
+ * the analog watchdog own filter, they are considered to be on 16 bits, but
+ * coded on 24 bits where the 16MSB are considered and the 8 LSB discarded. So
+ * perform this shifting here.
+ *
+ */
+void HAL_DFSDM_set_analog_watchdog_thresholds(
+    DFSDM_Filter_AwdParamTypeDef* io_dfsdm_analog_watchdog_parameters,
+    int32_t i_high_threshold, int32_t i_low_threshold) {
+  if (io_dfsdm_analog_watchdog_parameters->DataSource ==
+      DFSDM_FILTER_AWD_CHANNEL_DATA) {
+    if (i_high_threshold > __INT16_MAX__) {
+      io_dfsdm_analog_watchdog_parameters->HighThreshold = __INT16_MAX__ * 256;
+    } else {
+      io_dfsdm_analog_watchdog_parameters->HighThreshold =
+          i_high_threshold * 256;
+    }
 
+    if (i_low_threshold < (-__INT16_MAX__ - 1)) {
+      io_dfsdm_analog_watchdog_parameters->LowThreshold =
+          (-__INT16_MAX__ - 1) * 256;
+    } else {
+      io_dfsdm_analog_watchdog_parameters->LowThreshold = i_low_threshold * 256;
+    }
+  } else {
+    io_dfsdm_analog_watchdog_parameters->HighThreshold = i_high_threshold;
+    io_dfsdm_analog_watchdog_parameters->LowThreshold = i_low_threshold;
+  }
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF
