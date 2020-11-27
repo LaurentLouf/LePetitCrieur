@@ -84,7 +84,7 @@ void MX_DFSDM1_Init(void) {
   hdsfdm1_awd.Channel = DFSDM_CHANNEL_1;
   hdsfdm1_awd.HighBreakSignal = DFSDM_NO_BREAK_SIGNAL;
   hdsfdm1_awd.LowBreakSignal = DFSDM_NO_BREAK_SIGNAL;
-  HAL_DFSDM_set_analog_watchdog_thresholds(&hdsfdm1_awd, 5000, -8388608);
+  DFSDM_set_analog_watchdog_thresholds(&hdsfdm1_awd, 5000, -8388608);
 
   if (HAL_DFSDM_FilterAwdStart_IT(&hdfsdm1_filter0, &hdsfdm1_awd) != HAL_OK) {
     Error_Handler();

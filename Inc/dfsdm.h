@@ -40,7 +40,7 @@ extern DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 void MX_DFSDM1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void HAL_DFSDM_set_analog_watchdog_thresholds(
+void DFSDM_set_analog_watchdog_thresholds(
     DFSDM_Filter_AwdParamTypeDef* io_dfsdm_analog_watchdog_parameters,
     int32_t i_high_threshold, int32_t i_low_threshold);
 /* USER CODE END Prototypes */
