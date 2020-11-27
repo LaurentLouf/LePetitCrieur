@@ -80,8 +80,7 @@ void MX_DFSDM1_Init(void) {
   }
 
   /* USER CODE BEGIN MX_DFSDM1_Init */
-  DFSDM_activate_analog_watchdog(5000, -8388000);
-
+  DFSDM_activate_analog_watchdog(1000, -8388000);
   if (HAL_DFSDM_FilterExdStart(&hdfsdm1_filter0, DFSDM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }

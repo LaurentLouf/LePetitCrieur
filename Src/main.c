@@ -105,7 +105,6 @@ int main(void) {
    * Systick.
    */
   HAL_Init();
-
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -360,10 +359,12 @@ void enter_low_power_mode(void) {
   MX_CRC_DeInit();
   change_system_clock_to_low_power();
   HAL_SuspendTick();
+  DFSDM_activate_analog_watchdog(1000, -8388000);
   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
 void exit_low_power_mode(void) {
+  DFSDM_deactivate_analog_watchdog();
   SystemClock_Config();
   HAL_ResumeTick();
   MX_FMC_Init();
