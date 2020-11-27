@@ -80,6 +80,7 @@ void LCD_Display_Microphone_Info_Update(uint32_t i_extreme_detected,
 void turn_off_user_leds(void);
 void enter_low_power_mode(void);
 void exit_low_power_mode(void);
+void change_system_clock_to_low_power(void);
 
 /* USER CODE END PFP */
 
@@ -285,6 +286,69 @@ void LCD_DeInit(void) {
 void turn_off_user_leds(void) {
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+}
+
+/**
+ * \brief Change the clocks configuration for a low energy consumption
+ *
+ * Prior to making any change, switch the SYS clock to use the MSI, after making
+ * sure it is on.
+ * The PLL can then be configured to output a PLL clock of 14MHz.
+ * This value is chosen to be high enough for the DSFDM to be able to perform
+ * properly (the rate of samples of the microphone is
+ * 11.3MHz (SAI1 clock) / 4 (DFSDM output clock divider) = 2.8MHz, and the clock
+ * of the DFSDM must be at least 4 times this value).
+ * The SYS clock source is then defined as the PLL clock and we use an AHB
+ * prescaler of 16 to further decrease the frequency of the different system
+ * clocks.
+ *
+ */
+void change_system_clock_to_low_power(void) {
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+
+  // Configure the system clock to not use the PLL to be able to configure it
+  // just after
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
+    Error_Handler();
+  }
+
+  // Modify the PLL configuration to still get a high DFSDM clock frequency (it
+  // uses SYS clock) of 14MHz
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
+  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLN = 28;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV8;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
+
+  // Reconfigure the sys clock to use the PLL and apply an additionnal divider
+  // to obtain a HCLK of 875kHz
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV16;
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
+    Error_Handler();
+  }
+
+  // Configure the main internal regulator output voltage
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE2) != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 void enter_low_power_mode(void) {
