@@ -330,7 +330,7 @@ void HAL_DFSDM_ChannelMspDeInit(
  * perform this shifting here.
  *
  */
-void HAL_DFSDM_set_analog_watchdog_thresholds(
+void DFSDM_set_analog_watchdog_thresholds(
     DFSDM_Filter_AwdParamTypeDef* io_dfsdm_analog_watchdog_parameters,
     int32_t i_high_threshold, int32_t i_low_threshold) {
   if (io_dfsdm_analog_watchdog_parameters->DataSource ==
