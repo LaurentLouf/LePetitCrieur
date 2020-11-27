@@ -36,7 +36,6 @@
  * Enable DMA controller clock
  */
 void MX_DMA_Init(void) {
-
   /* DMA controller clock enable */
   __HAL_RCC_DMAMUX1_CLK_ENABLE();
   __HAL_RCC_DMA1_CLK_ENABLE();
@@ -49,6 +48,14 @@ void MX_DMA_Init(void) {
 
 /* USER CODE BEGIN 2 */
 
+void MX_DMA_DeInit(void) {
+  // DMA interrupt de init
+  HAL_NVIC_DisableIRQ(DMA1_Channel4_IRQn);
+
+  // Deactivation of DMA clocks
+  __HAL_RCC_DMA1_CLK_DISABLE();
+  __HAL_RCC_DMAMUX1_CLK_DISABLE();
+}
 /* USER CODE END 2 */
 
 /**
