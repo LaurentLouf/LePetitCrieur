@@ -349,6 +349,17 @@ void change_system_clock_to_low_power(void) {
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE2) != HAL_OK) {
     Error_Handler();
   }
+
+  // Disable MSI auto-calibration not needed for analog watchdog and disable the
+  // LSE, only used for the auto-calibration
+  HAL_RCCEx_DisableMSIPLLMode();
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState =
+      RCC_LSE_OFF;  // could also be changed to RTC only if needed
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 void enter_low_power_mode(void) {
