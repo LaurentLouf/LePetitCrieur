@@ -324,6 +324,7 @@ void change_system_clock_to_low_power(void) {
 
   // Modify the PLL configuration to still get a high DFSDM clock frequency (it
   // uses SYS clock) of 14MHz
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
