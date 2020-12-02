@@ -371,7 +371,7 @@ void enter_low_power_mode(void) {
   MX_CRC_DeInit();
   change_system_clock_to_low_power();
   HAL_SuspendTick();
-  DFSDM_activate_analog_watchdog(1000, -8388000);
+  DFSDM_activate_analog_watchdog(1000, DFSDM_ANALOG_WATCHDOG_MIN_THRESHOLD);
   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
