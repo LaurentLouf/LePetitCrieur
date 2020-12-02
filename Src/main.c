@@ -119,7 +119,7 @@ int main(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_DFSDM1_Init();
+  MX_DFSDM1_Init(DFSDM_NORMAL_MODE);
   DFSDM_activate_analog_watchdog(1000, DFSDM_ANALOG_WATCHDOG_MIN_THRESHOLD);
   MX_FMC_Init();
   /* USER CODE BEGIN 2 */
@@ -372,6 +372,7 @@ void enter_low_power_mode(void) {
   MX_CRC_DeInit();
   change_system_clock_to_low_power();
   HAL_SuspendTick();
+  MX_DFSDM1_Init(DFSDM_LOW_POWER_MODE);
   DFSDM_activate_analog_watchdog(1000, DFSDM_ANALOG_WATCHDOG_MIN_THRESHOLD);
   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
@@ -382,6 +383,7 @@ void exit_low_power_mode(void) {
   HAL_ResumeTick();
   MX_FMC_Init();
   MX_DMA_Init();
+  MX_DFSDM1_Init(DFSDM_NORMAL_MODE);
   HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0, record_buffer,
                                    RECORD_BUFFER_SIZE);
   MX_OCTOSPI1_Init();

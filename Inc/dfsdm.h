@@ -34,11 +34,12 @@ extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 extern DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 
 /* USER CODE BEGIN Private defines */
-
+#define DFSDM_LOW_POWER_MODE true
+#define DFSDM_NORMAL_MODE false
 #define DFSDM_ANALOG_WATCHDOG_MIN_THRESHOLD -8388000
 /* USER CODE END Private defines */
 
-void MX_DFSDM1_Init(void);
+void MX_DFSDM1_Init(bool i_initialize_low_power_mode);
 
 /* USER CODE BEGIN Prototypes */
 void DFSDM_set_analog_watchdog_thresholds(

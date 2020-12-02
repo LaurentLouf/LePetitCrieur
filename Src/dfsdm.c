@@ -33,12 +33,20 @@ static bool DFSDM1_Initialized = false;
 
 /**
  * \brief Initialize the DFSDM (Digital Filter Sigma-Delta Modulator)
+ * \param[in] i_initialize_low_power_mode Initialize the module in low power
+ * mode
  *
  * The MEMS microphone uses the clock provided by the DFSDM. It can uses clock
  * frequencies from 351kHz to 4.8MHz. So we enable the output clock and use a
  * prescaer value of 4 to get a frequency of
  * 11.294MHz (clock used by DFSDM) / 4 = 2.8235MHz, right in the range. Using 64
- * as oversampling value gives a final sampling frequency of 44.117kHz
+ * as oversampling value gives a final sampling frequency of 44.117kHz.
+ *
+ * In low power mode, when we will just use the analog watchdog, we use a lower
+ * frequency to save power (the microphone consumes less at lower operating
+ * frequencies). To do that, we use a greater prescaler value for the output
+ * clock, 16, resulting in an output clock around 700kHz (low power mode for the
+ * microphone is at operating frequencies between 351 and 815kHz).
  *
  * For the filter, a 3rd order filter and an oversampling of 64 samples gives an
  * output resolution of 1+3*log2(64) = 19 bits. For use of the data, see the
@@ -48,7 +56,14 @@ static bool DFSDM1_Initialized = false;
  * The filter for the analog watchdog (awd) is also initialized but the analog
  * watchdog not started.
  */
-void MX_DFSDM1_Init(void) {
+void MX_DFSDM1_Init(bool i_initialize_low_power_mode) {
+  if (HAL_DFSDM_ChannelGetState(&hdfsdm1_channel1) !=
+      HAL_DFSDM_CHANNEL_STATE_RESET) {
+    HAL_DFSDM_ChannelDeInit(&hdfsdm1_channel1);
+    HAL_DFSDM_FilterDeInit(&hdfsdm1_filter0);
+  }
+
+  // The filter initialisation stays the same in low power and normal mode
   hdfsdm1_filter0.Instance = DFSDM1_Filter0;
   hdfsdm1_filter0.Init.RegularParam.Trigger = DFSDM_FILTER_SW_TRIGGER;
   hdfsdm1_filter0.Init.RegularParam.FastMode = ENABLE;
@@ -59,11 +74,8 @@ void MX_DFSDM1_Init(void) {
   if (HAL_DFSDM_FilterInit(&hdfsdm1_filter0) != HAL_OK) {
     Error_Handler();
   }
+
   hdfsdm1_channel1.Instance = DFSDM1_Channel1;
-  hdfsdm1_channel1.Init.OutputClock.Activation = ENABLE;
-  hdfsdm1_channel1.Init.OutputClock.Selection =
-      DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
-  hdfsdm1_channel1.Init.OutputClock.Divider = 4;
   hdfsdm1_channel1.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel1.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel1.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
@@ -74,6 +86,15 @@ void MX_DFSDM1_Init(void) {
   hdfsdm1_channel1.Init.Awd.Oversampling = 32;
   hdfsdm1_channel1.Init.Offset = 0;
   hdfsdm1_channel1.Init.RightBitShift = 0x00;
+  hdfsdm1_channel1.Init.OutputClock.Activation = ENABLE;
+  hdfsdm1_channel1.Init.OutputClock.Selection =
+      DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
+  if (i_initialize_low_power_mode == true) {
+    hdfsdm1_channel1.Init.OutputClock.Divider = 16;
+  } else {
+    hdfsdm1_channel1.Init.OutputClock.Divider = 4;
+  }
+
   if (HAL_DFSDM_ChannelInit(&hdfsdm1_channel1) != HAL_OK) {
     Error_Handler();
   }
