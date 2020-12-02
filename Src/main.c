@@ -293,14 +293,13 @@ void turn_off_user_leds(void) {
  *
  * Prior to making any change, switch the SYS clock to use the MSI, after making
  * sure it is on.
- * The PLL can then be configured to output a PLL clock of 14MHz.
+ * The PLL can then be configured to output a PLL clock of 8MHz.
  * This value is chosen to be high enough for the DSFDM to be able to perform
  * properly (the rate of samples of the microphone is
- * 11.3MHz (SAI1 clock) / 4 (DFSDM output clock divider) = 2.8MHz, and the clock
- * of the DFSDM must be at least 4 times this value).
- * The SYS clock source is then defined as the PLL clock and we use an AHB
- * prescaler of 16 to further decrease the frequency of the different system
- * clocks.
+ * 11.3MHz (SAI1 clock) / 16 (DFSDM output clock divider) = 706kHz, and the
+ * clock of the DFSDM must be at least 4 times this value). The SYS clock source
+ * is then defined as the PLL clock and we use an AHB prescaler of 16 to further
+ * decrease the frequency of the different system clocks.
  *
  */
 void change_system_clock_to_low_power(void) {
@@ -324,12 +323,12 @@ void change_system_clock_to_low_power(void) {
   }
 
   // Modify the PLL configuration to still get a high DFSDM clock frequency (it
-  // uses SYS clock) of 14MHz
+  // uses SYS clock) of 8MHz
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 28;
+  RCC_OscInitStruct.PLL.PLLN = 16;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV8;
@@ -338,7 +337,7 @@ void change_system_clock_to_low_power(void) {
   }
 
   // Reconfigure the sys clock to use the PLL and apply an additionnal divider
-  // to obtain a HCLK of 875kHz
+  // to obtain a HCLK of 500kHz
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV16;
