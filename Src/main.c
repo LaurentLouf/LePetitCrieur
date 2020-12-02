@@ -120,6 +120,7 @@ int main(void) {
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_DFSDM1_Init();
+  DFSDM_activate_analog_watchdog(1000, DFSDM_ANALOG_WATCHDOG_MIN_THRESHOLD);
   MX_FMC_Init();
   /* USER CODE BEGIN 2 */
 

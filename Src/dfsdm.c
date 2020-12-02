@@ -45,8 +45,8 @@ static bool DFSDM1_Initialized = false;
  * reference manual for DFSDM_FLTxJDATAR registers : only the 24MSB make the
  * sample data, the first 8 LSB only contain the DFSDM channel.
  *
- * The filter for the analog watchdog (awd) is also initialized then the analog
- * watchdog itself is started along with the extremes detector.
+ * The filter for the analog watchdog (awd) is also initialized but the analog
+ * watchdog not started.
  */
 void MX_DFSDM1_Init(void) {
   hdfsdm1_filter0.Instance = DFSDM1_Filter0;
@@ -81,10 +81,6 @@ void MX_DFSDM1_Init(void) {
                                        DFSDM_CONTINUOUS_CONV_ON) != HAL_OK) {
     Error_Handler();
   }
-
-  /* USER CODE BEGIN MX_DFSDM1_Init */
-  DFSDM_activate_analog_watchdog(1000, -8388000);
-  /* USER CODE END MX_DFSDM1_Init */
 }
 
 void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
