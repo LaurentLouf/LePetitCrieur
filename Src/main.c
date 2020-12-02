@@ -291,23 +291,29 @@ void turn_off_user_leds(void) {
 /**
  * \brief Change the clocks configuration for a low energy consumption
  *
- * Prior to making any change, switch the SYS clock to use the MSI, after making
- * sure it is on.
- * The PLL can then be configured to output a PLL clock of 8MHz.
- * This value is chosen to be high enough for the DSFDM to be able to perform
- * properly (the rate of samples of the microphone is
- * 11.3MHz (SAI1 clock) / 16 (DFSDM output clock divider) = 706kHz, and the
- * clock of the DFSDM must be at least 4 times this value). The SYS clock source
- * is then defined as the PLL clock and we use an AHB prescaler of 16 to further
- * decrease the frequency of the different system clocks.
+ * Begin by making sure that the MSI is running at 4MHz (range 6). When this is
+ * done, set the SYS clock to use the MSI. This value is chosen to be high
+ * enough for the DSFDM to be able to perform properly (the rate of samples of
+ * the microphone is 11.3MHz (SAI1 clock) / 16 (DFSDM output clock divider) =
+ * 706kHz, and the clock of the DFSDM must be at least 4 times this value).
+ *
+ * At this point, the PLL isn't used anymore so disable it, then change the
+ * voltage scaling to the range 2 which can only go up to 26MHz (which explains
+ * why we change the frequency first) but is more energy efficient.
+ *
+ * Disable the MSI auto-calibration feature that won't be needed, and disable
+ * the LSE that was on only for this auto-calibration.
+ *
+ * Finish by setting a prescaler for AHB clock of 16, which decreases the
+ * different system clocks to 250kHz.
  *
  */
 void change_system_clock_to_low_power(void) {
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
-  // Configure the system clock to not use the PLL to be able to configure it
-  // just after
+  // Configure the system clock to use the MSI clock instead of the clock coming
+  // from the PLL, which becomes unused.
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
@@ -322,26 +328,10 @@ void change_system_clock_to_low_power(void) {
     Error_Handler();
   }
 
-  // Modify the PLL configuration to still get a high DFSDM clock frequency (it
-  // uses SYS clock) of 8MHz
+  // Turn off the PLL now that the SYS clock source has been changed
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
-  RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 16;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
-  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV8;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_OFF;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-    Error_Handler();
-  }
-
-  // Reconfigure the sys clock to use the PLL and apply an additionnal divider
-  // to obtain a HCLK of 500kHz
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV16;
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
     Error_Handler();
   }
 
@@ -358,6 +348,14 @@ void change_system_clock_to_low_power(void) {
       RCC_LSE_OFF;  // could also be changed to RTC only if needed
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
+  }
+
+  // Apply an additionnal divider (16) in the clock tree to obtain a HCLK of
+  // 250kHz
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV16;
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
     Error_Handler();
   }
 }
