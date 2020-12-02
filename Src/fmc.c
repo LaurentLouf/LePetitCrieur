@@ -20,9 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "fmc.h"
 
+#include <stdbool.h>
+
 /* USER CODE BEGIN 0 */
-static uint32_t FMC_Initialized = 0;
-static uint32_t FMC_DeInitialized = 0;
+static bool FMC_Initialized = false;
 /* USER CODE END 0 */
 
 SRAM_HandleTypeDef hsram1;
@@ -86,7 +87,6 @@ static void HAL_FMC_MspInit(void) {
   if (FMC_Initialized) {
     return;
   }
-  FMC_Initialized = 1;
 
   /* Peripheral clock enable */
   __HAL_RCC_FMC_CLK_ENABLE();
@@ -161,7 +161,7 @@ static void HAL_FMC_MspInit(void) {
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* USER CODE BEGIN FMC_MspInit 1 */
-  FMC_DeInitialized = 0;
+  FMC_Initialized = true;
   /* USER CODE END FMC_MspInit 1 */
 }
 
@@ -179,10 +179,9 @@ static void HAL_FMC_MspDeInit(void) {
   /* USER CODE BEGIN FMC_MspDeInit 0 */
 
   /* USER CODE END FMC_MspDeInit 0 */
-  if (FMC_DeInitialized) {
+  if (FMC_Initialized == false) {
     return;
   }
-  FMC_DeInitialized = 1;
   /* Peripheral clock enable */
   __HAL_RCC_FMC_CLK_DISABLE();
 
@@ -236,7 +235,7 @@ static void HAL_FMC_MspDeInit(void) {
                              GPIO_PIN_9 | GPIO_PIN_13);
 
   /* USER CODE BEGIN FMC_MspDeInit 1 */
-  FMC_Initialized = 0;
+  FMC_Initialized = false;
   /* USER CODE END FMC_MspDeInit 1 */
 }
 
@@ -260,7 +259,11 @@ void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *sramHandle) {
  *  - Which finally calls HAL_FMC_MspDeInit
  *
  */
-void MX_FMC_DeInit(void) { HAL_SRAM_DeInit(&hsram1); }
+void MX_FMC_DeInit(void) {
+  if (FMC_Initialized) {
+    HAL_SRAM_DeInit(&hsram1);
+  }
+}
 /* USER CODE END 1 */
 
 /**
