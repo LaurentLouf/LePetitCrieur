@@ -27,7 +27,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;

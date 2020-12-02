@@ -28,6 +28,9 @@ DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
+static bool HAL_RCC_DFSDM1_CLK_ENABLED = false;
+static bool DFSDM1_Initialized = false;
+
 /**
  * \brief Initialize the DFSDM (Digital Filter Sigma-Delta Modulator)
  *
@@ -84,14 +87,10 @@ void MX_DFSDM1_Init(void) {
   /* USER CODE END MX_DFSDM1_Init */
 }
 
-static uint32_t HAL_RCC_DFSDM1_CLK_ENABLED = 0;
-
-static uint32_t DFSDM1_Init = 0;
-
 void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-  if (DFSDM1_Init == 0) {
+  if (DFSDM1_Initialized == false) {
     /* USER CODE BEGIN DFSDM1_MspInit 0 */
 
     /* USER CODE END DFSDM1_MspInit 0 */
@@ -114,9 +113,9 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
     }
 
     /* DFSDM1 clock enable */
-    HAL_RCC_DFSDM1_CLK_ENABLED++;
-    if (HAL_RCC_DFSDM1_CLK_ENABLED == 1) {
+    if (HAL_RCC_DFSDM1_CLK_ENABLED == false) {
       __HAL_RCC_DFSDM1_CLK_ENABLE();
+      HAL_RCC_DFSDM1_CLK_ENABLED = true;
     }
 
     __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -143,7 +142,7 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
     /* USER CODE END DFSDM1_MspInit 1 */
-    DFSDM1_Init++;
+    DFSDM1_Initialized = true;
   }
 
   /* DFSDM1 DMA Init */
@@ -187,7 +186,7 @@ void HAL_DFSDM_ChannelMspInit(
     DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-  if (DFSDM1_Init == 0) {
+  if (DFSDM1_Initialized == false) {
     /* USER CODE BEGIN DFSDM1_MspInit 0 */
 
     /* USER CODE END DFSDM1_MspInit 0 */
@@ -210,9 +209,9 @@ void HAL_DFSDM_ChannelMspInit(
     }
 
     /* DFSDM1 clock enable */
-    HAL_RCC_DFSDM1_CLK_ENABLED++;
-    if (HAL_RCC_DFSDM1_CLK_ENABLED == 1) {
+    if (HAL_RCC_DFSDM1_CLK_ENABLED == false) {
       __HAL_RCC_DFSDM1_CLK_ENABLE();
+      HAL_RCC_DFSDM1_CLK_ENABLED = true;
     }
 
     __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -239,18 +238,18 @@ void HAL_DFSDM_ChannelMspInit(
     /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
     /* USER CODE END DFSDM1_MspInit 1 */
-    DFSDM1_Init++;
+    DFSDM1_Initialized = true;
   }
 }
 
 void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
-  DFSDM1_Init--;
-  if (DFSDM1_Init == 0) {
+  if (DFSDM1_Initialized == true) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
 
     /* USER CODE END DFSDM1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_DFSDM1_CLK_DISABLE();
+    HAL_RCC_DFSDM1_CLK_ENABLED = false;
 
     /**DFSDM1 GPIO Configuration
     PG7     ------> DFSDM1_CKOUT
@@ -260,25 +259,25 @@ void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef* dfsdm_filterHandle) {
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12);
 
-    /* DFSDM1 DMA DeInit */
-    HAL_DMA_DeInit(dfsdm_filterHandle->hdmaInj);
-    HAL_DMA_DeInit(dfsdm_filterHandle->hdmaReg);
-
     /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
-
+    DFSDM1_Initialized = false;
     /* USER CODE END DFSDM1_MspDeInit 1 */
   }
+
+  /* DFSDM1 DMA DeInit */
+  HAL_DMA_DeInit(dfsdm_filterHandle->hdmaInj);
+  HAL_DMA_DeInit(dfsdm_filterHandle->hdmaReg);
 }
 
 void HAL_DFSDM_ChannelMspDeInit(
     DFSDM_Channel_HandleTypeDef* dfsdm_channelHandle) {
-  DFSDM1_Init--;
-  if (DFSDM1_Init == 0) {
+  if (DFSDM1_Initialized == false) {
     /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
 
     /* USER CODE END DFSDM1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_DFSDM1_CLK_DISABLE();
+    HAL_RCC_DFSDM1_CLK_ENABLED = false;
 
     /**DFSDM1 GPIO Configuration
     PG7     ------> DFSDM1_CKOUT
@@ -288,12 +287,13 @@ void HAL_DFSDM_ChannelMspDeInit(
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12);
 
-    /* DFSDM1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(DFSDM1_FLT0_IRQn);
     /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
-
+    DFSDM1_Initialized = false;
     /* USER CODE END DFSDM1_MspDeInit 1 */
   }
+
+  /* DFSDM1 interrupt Deinit */
+  HAL_NVIC_DisableIRQ(DFSDM1_FLT0_IRQn);
 }
 
 /* USER CODE BEGIN 1 */
